@@ -7,24 +7,38 @@ import postcss from "prettier/plugins/postcss";
 import typescript from "prettier/plugins/typescript";
 import { useState } from "react";
 import { codeToHtml } from "shiki";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const langToParser = new Map([
+  ["typescript", "typescript"],
+  ["css", postcss],
+  ["bash", "bash"],
+  ["json", "json"],
+]);
 
 export function FreakyShiki() {
   const [html, setHtml] = useState<string | null>(null);
-
-  const [lang, setLang] = useState<string>("ts");
+  const [lang, setLang] = useState<string>("typescript");
+  console.log(lang);
 
   async function handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     try {
       const formattedCode = await format(event.target.value, {
-        parser: "typescript",
+        parser: lang,
         plugins: [postcss, babel, estree, typescript],
       });
 
       const html = await codeToHtml(formattedCode, {
-        lang: "typescript",
+        lang: lang,
         themes: {
           light: "min-light",
-          dark: "dark-plus",
+          dark: "min-dark",
         },
       });
 
@@ -41,8 +55,19 @@ export function FreakyShiki() {
   }
 
   return (
-    <div>
-      <Textarea className="mb-2" onChange={handleChange} />
+    <div className="space-y-2">
+      <Select onValueChange={(e) => setLang(e)} value={lang}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Language" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="typescript">TypeScript</SelectItem>
+          <SelectItem value="css">CSS</SelectItem>
+          <SelectItem value="bash">Bash</SelectItem>
+          <SelectItem value="json">JSON</SelectItem>
+        </SelectContent>
+      </Select>
+      <Textarea onChange={handleChange} />
       <Button onClick={copy}>Copy</Button>
       <div
         dangerouslySetInnerHTML={{
