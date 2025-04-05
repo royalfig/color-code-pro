@@ -7,7 +7,7 @@ import postcss from "prettier/plugins/postcss";
 import typescript from "prettier/plugins/typescript";
 import html from "prettier/plugins/html";
 import yaml from "prettier/plugins/yaml";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { codeToHtml } from "shiki";
 import {
   Select,
@@ -17,7 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const langMap = new Map([
+// Move langMap outside component to prevent recreation
+const LANG_MAP = new Map([
   ["typescript", "typescript"],
   ["javascript", "babel"],
   ["css", "css"],
@@ -26,68 +27,103 @@ const langMap = new Map([
   ["yaml", "yaml"],
 ]);
 
-console.log(langMap.get("typescript"));
+// Memoize theme options
+const THEME_OPTIONS = {
+  light: "min-light",
+  dark: "dark-plus",
+};
+
+const COLOR_REPLACEMENTS = {
+  "dark-plus": {
+    "#1e1e1e": "var(--cl-surface)",
+  },
+};
+
+// Debounce function
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
 
 export function FreakyShiki() {
   const [renderedHtml, updateRenderedHtml] = useState<string | null>(null);
   const [lang, setLang] = useState<string>("typescript");
   const text = useRef<HTMLTextAreaElement>(null);
 
-  async function handleChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-    try {
-      const rawHtml = await codeToHtml(event.target.value, {
-        lang: lang,
-        themes: {
-          light: "min-light",
-          dark: "dark-plus",
-        },
-        colorReplacements: {
-          "dark-plus": {
-            "#1e1e1e": "var(--cl-surface)",
-          },
-        },
-      });
-
-      updateRenderedHtml(rawHtml);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function formatCode() {
+  // Memoize the code formatting function
+  const formatCode = useCallback(async () => {
     if (!text.current) return;
 
-    const formatted = await format(text.current.value, {
-      parser: langMap.get(lang),
-      plugins: [postcss, babel, estree, typescript, html, yaml],
-    });
+    try {
+      const formatted = await format(text.current.value, {
+        parser: LANG_MAP.get(lang),
+        plugins: [postcss, babel, estree, typescript, html, yaml],
+      });
 
-    const stylized = await codeToHtml(formatted, {
-      lang: lang,
-      themes: {
-        light: "min-light",
-        dark: "dark-plus",
-      },
-      colorReplacements: {
-        "dark-plus": {
-          "#1e1e1e": "var(--cl-surface)",
-        },
-      },
-    });
+      const stylized = await codeToHtml(formatted, {
+        lang: lang,
+        themes: THEME_OPTIONS,
+        colorReplacements: COLOR_REPLACEMENTS,
+      });
 
-    updateRenderedHtml(stylized);
-  }
+      updateRenderedHtml(stylized);
+    } catch (error) {
+      console.error("Error formatting code:", error);
+    }
+  }, [lang]);
 
-  function copy() {
+  // Memoize the HTML generation function
+  const generateHtml = useCallback(
+    async (code: string) => {
+      try {
+        const rawHtml = await codeToHtml(code, {
+          lang: lang,
+          themes: THEME_OPTIONS,
+          colorReplacements: COLOR_REPLACEMENTS,
+        });
+        return rawHtml;
+      } catch (error) {
+        console.error("Error generating HTML:", error);
+        return null;
+      }
+    },
+    [lang]
+  );
+
+  // Debounced change handler
+  const debouncedHandleChange = useMemo(
+    () =>
+      debounce(async (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const html = await generateHtml(event.target.value);
+        if (html) {
+          updateRenderedHtml(html);
+        }
+      }, 300),
+    [generateHtml]
+  );
+
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      debouncedHandleChange(event);
+    },
+    [debouncedHandleChange]
+  );
+
+  const copy = useCallback(() => {
     if (!renderedHtml) return;
     const wrappedHtml = codeWrapper({ lang, renderedHtml });
-
     navigator.clipboard.writeText(wrappedHtml || "");
-  }
+  }, [renderedHtml, lang]);
 
   return (
     <div className="space-y-2">
-      <Select onValueChange={(e) => setLang(e)} value={lang}>
+      <Select onValueChange={setLang} value={lang}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Language" />
         </SelectTrigger>
@@ -102,14 +138,14 @@ export function FreakyShiki() {
       </Select>
       <div className="relative border rounded-md p-2 min-h-80 font-mono leading-tight">
         <div
-          className="relative  w-full h-full "
+          className="relative w-full h-full"
           dangerouslySetInnerHTML={{
             __html: renderedHtml || "",
           }}
-        ></div>
+        />
         <textarea
           onChange={handleChange}
-          className=" w-full h-full z-10 absolute inset-0 p-2 text-transparent caret-red-600 bg-transparent"
+          className="w-full h-full z-10 absolute inset-0 p-2 text-transparent caret-red-600 bg-transparent"
           ref={text}
         />
       </div>
