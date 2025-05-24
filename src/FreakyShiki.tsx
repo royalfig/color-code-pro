@@ -25,6 +25,7 @@ const LANG_MAP = new Map([
   ["json", "json"],
   ["html", "html"],
   ["yaml", "yaml"],
+  ["bash", "bash"],
 ]);
 
 // Memoize theme options
@@ -61,10 +62,15 @@ export function FreakyShiki() {
     if (!text.current) return;
 
     try {
-      const formatted = await format(text.current.value, {
-        parser: LANG_MAP.get(lang),
-        plugins: [postcss, babel, estree, typescript, html, yaml],
-      });
+      let formatted = text.current.value;
+
+      // Only format if not bash
+      if (lang !== "bash") {
+        formatted = await format(text.current.value, {
+          parser: LANG_MAP.get(lang),
+          plugins: [postcss, babel, estree, typescript, html, yaml],
+        });
+      }
 
       const stylized = await codeToHtml(formatted, {
         lang: lang,
@@ -134,6 +140,7 @@ export function FreakyShiki() {
           <SelectItem value="json">JSON</SelectItem>
           <SelectItem value="html">HTML</SelectItem>
           <SelectItem value="yaml">YAML</SelectItem>
+          <SelectItem value="bash">Bash</SelectItem>
         </SelectContent>
       </Select>
       <div className="relative border rounded-md p-2 min-h-80 font-mono leading-tight">
