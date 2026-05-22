@@ -1,12 +1,14 @@
+import { ThemeProvider } from "./context/themeProvider";
 import { FreakyShiki } from "./FreakyShiki";
 
-function App() {
+export default function App() {
   return (
-    <div className="container p-24 mx-auto">
-      <h1 className="text-xl font-bold">Freaky Shiki</h1>
-      <FreakyShiki />
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen bg-background flex items-center justify-center p-10">
+        <div className="w-full max-w-4xl">
+          <FreakyShiki />
+        </div>
+      </div>
+    </ThemeProvider>
   );
 }
-
-export default App;
