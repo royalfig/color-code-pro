@@ -22,6 +22,9 @@ import { highlightCode } from "./lib/shiki";
 import type { ThemeRegistration } from "shiki";
 import { useTheme } from "./hooks/useTheme";
 import type { PaletteKind, PaletteStyle } from "./types";
+import { Button, IconButton, ButtonGroup } from "./components/Button/Button";
+import { Select } from "./components/Select/Select";
+import { Editor } from "./components/Editor/Editor";
 import "./FreakyShiki.css";
 
 const LANG_SHORT: Record<string, string> = {
@@ -188,13 +191,12 @@ export function FreakyShiki() {
               </div>
             )}
           </div>
-          <span className="fs-title">Freaky Shiki</span>
+          <span className="fs-title">{baseColor}</span>
         </div>
 
         <div className="fs-header-right">
-          {/* Language */}
-          <select
-            className="fs-select fs-select--lang"
+          <Select
+            size="sm"
             value={lang}
             onChange={(e) => setLang(e.target.value)}
             aria-label="Language"
@@ -204,11 +206,10 @@ export function FreakyShiki() {
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
 
-          {/* Palette kind */}
-          <select
-            className="fs-select fs-select--palette"
+          <Select
+            size="lg"
             value={paletteKind}
             onChange={(e) => setPaletteKind(e.target.value as PaletteKind)}
             aria-label="Palette kind"
@@ -220,71 +221,50 @@ export function FreakyShiki() {
                 </option>
               ),
             )}
-          </select>
+          </Select>
 
-          {/* Shape buttons */}
-          <div className="fs-shape-group" role="group" aria-label="Palette shape">
+          <ButtonGroup label="Palette shape">
             {SHAPES.map(({ value, Icon }) => (
-              <button
+              <IconButton
                 key={value}
-                className="fs-btn-icon"
                 aria-pressed={paletteStyle === value}
                 aria-label={value}
                 onClick={() => setPaletteStyle(value)}
               >
                 <Icon size={16} />
-              </button>
+              </IconButton>
             ))}
-          </div>
+          </ButtonGroup>
 
-          {/* Dark/light toggle */}
-          <button
-            className="fs-btn-ghost"
+          <IconButton
+            variant="ghost"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             aria-label="Toggle dark mode"
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          </IconButton>
         </div>
       </div>
 
-      {/* Editor */}
-      <div
-        className="fs-editor"
-        style={
-          {
-            backgroundColor: editorBg,
-            "--fs-line-col": LINE_COL,
-          } as React.CSSProperties
-        }
-      >
-        <div
-          className="fs-editor-preview"
-          dangerouslySetInnerHTML={{ __html: renderedHtml || "" }}
-        />
-        <textarea
-          ref={textRef}
-          onChange={handleChange}
-          spellCheck={false}
-          className="fs-editor-textarea"
-          style={{ paddingLeft: `calc(${LINE_COL} + 1rem)` }}
-        />
-      </div>
+      <Editor
+        editorBg={editorBg}
+        renderedHtml={renderedHtml}
+        textRef={textRef}
+        onChange={handleChange}
+        lineCol={LINE_COL}
+      />
 
       {/* Footer */}
       <div className="fs-footer">
-        <button className="fs-btn" onClick={formatCode}>
-          <Wand size={14} />
+        <Button icon={<Wand size={14} />} onClick={formatCode}>
           {loading ? "Formatting…" : "Format"}
-        </button>
-        <button className="fs-btn fs-btn-primary" onClick={copy}>
-          <Copy size={14} />
+        </Button>
+        <Button variant="primary" icon={<Copy size={14} />} onClick={copy}>
           Copy
-        </button>
-        <button className="fs-btn" onClick={downloadJson}>
-          <Download size={14} />
+        </Button>
+        <Button icon={<Download size={14} />} onClick={downloadJson}>
           Download JSON
-        </button>
+        </Button>
       </div>
     </div>
   );
