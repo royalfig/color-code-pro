@@ -2,8 +2,7 @@
 .fs-card {
   border-radius: var(--radius-xl);
   background: var(--color-container);
-  box-shadow: 0 4px 24px
-    color-mix(in srgb, var(--color-on-surface) 12%, transparent);
+  box-shadow: var(--shadow-elevation-high);
   overflow: hidden;
   width: min(900px, 100%);
 }
