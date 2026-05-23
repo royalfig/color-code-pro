@@ -6,7 +6,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: React.ReactNode;
 }
 
-export function Button({ variant = "default", icon, children, className, ...props }: ButtonProps) {
+export function Button({
+  variant = "default",
+  icon,
+  children,
+  className,
+  ...props
+}: ButtonProps) {
   const cls = ["fs-btn", variant === "primary" && "fs-btn-primary", className]
     .filter(Boolean)
     .join(" ");
@@ -22,7 +28,12 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "ghost";
 }
 
-export function IconButton({ variant = "default", children, className, ...props }: IconButtonProps) {
+export function IconButton({
+  variant = "default",
+  children,
+  className,
+  ...props
+}: IconButtonProps) {
   const cls = [variant === "ghost" ? "fs-btn-ghost" : "fs-btn-icon", className]
     .filter(Boolean)
     .join(" ");

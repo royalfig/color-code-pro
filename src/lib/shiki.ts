@@ -6,6 +6,7 @@ const highlighterPromise = createHighlighterCore({
   themes: [],
   langs: [
     import("@shikijs/langs/typescript"),
+    import("@shikijs/langs/tsx"),
     import("@shikijs/langs/javascript"),
     import("@shikijs/langs/css"),
     import("@shikijs/langs/json"),

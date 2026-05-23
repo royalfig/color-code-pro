@@ -1,34 +1,37 @@
-import { HexColorPicker } from "react-colorful";
+import { Editor } from "@/components/Editor/Editor";
+import { Select } from "@/components/Select/Select";
+import { Separator } from "@/components/Separator/Separator";
+
+import {
+  Circle,
+  Copy,
+  Diamond,
+  Download,
+  Moon,
+  Square,
+  Sun,
+  Triangle,
+  Wand,
+} from "lucide-react";
 import { format } from "prettier";
 import prettierBabel from "prettier/plugins/babel";
 import prettierEstree from "prettier/plugins/estree";
+import prettierHtml from "prettier/plugins/html";
 import prettierPostcss from "prettier/plugins/postcss";
 import prettierTypescript from "prettier/plugins/typescript";
-import prettierHtml from "prettier/plugins/html";
 import prettierYaml from "prettier/plugins/yaml";
-import {
-  Square,
-  Triangle,
-  Circle,
-  Diamond,
-  Sun,
-  Wand,
-  Copy,
-  Download,
-  Moon,
-} from "lucide-react";
-import { useState, useRef, useCallback, useEffect } from "react";
-import { highlightCode } from "./lib/shiki";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { HexColorPicker } from "react-colorful";
 import type { ThemeRegistration } from "shiki";
-import { useTheme } from "./hooks/useTheme";
-import type { PaletteKind, PaletteStyle } from "./types";
-import { Button, IconButton, ButtonGroup } from "./components/Button/Button";
-import { Select } from "./components/Select/Select";
-import { Editor } from "./components/Editor/Editor";
-import "./FreakyShiki.css";
+import { useTheme } from "../../hooks/useTheme";
+import { highlightCode } from "../../lib/shiki";
+import type { PaletteKind, PaletteStyle } from "../../types";
+import { Button, ButtonGroup, IconButton } from "../Button/Button";
+import "./Container.css";
 
 const LANG_SHORT: Record<string, string> = {
   typescript: "TS",
+  tsx: "TSX",
   javascript: "JS",
   css: "CSS",
   json: "JSON",
@@ -39,11 +42,65 @@ const LANG_SHORT: Record<string, string> = {
 
 const LANG_PRETTIER: Record<string, string> = {
   typescript: "typescript",
+  tsx: "typescript",
   javascript: "babel",
   css: "css",
   json: "json",
   html: "html",
   yaml: "yaml",
+};
+
+const LANG_PLACEHOLDER: Record<string, string> = {
+  typescript: `const greet = (name: string): string => {
+  return \`Hello, \${name}!\`;
+};
+
+console.log(greet("world"));`,
+  tsx: `function Greeting({ name }: { name: string }) {
+  return <h1>Hello, {name}!</h1>;
+}
+
+export default Greeting;`,
+  javascript: `const greet = (name) => {
+  return \`Hello, \${name}!\`;
+};
+
+console.log(greet("world"));`,
+  css: `.container {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+}`,
+  json: `{
+  "name": "my-app",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite"
+  }
+}`,
+  html: `<!doctype html>
+<html lang="en">
+  <head>
+    <title>Hello</title>
+  </head>
+  <body>
+    <h1>Hello, world!</h1>
+  </body>
+</html>`,
+  yaml: `name: my-app
+version: 1.0.0
+scripts:
+  dev: vite
+  build: tsc && vite build`,
+  bash: `#!/usr/bin/env bash
+set -e
+
+echo "Hello, world!"
+ls -la`,
+  python: `def greet(name: str) -> str:
+    return f"Hello, {name}!"
+
+print(greet("world"))`,
 };
 
 const PALETTE_LABELS: Record<PaletteKind, string> = {
@@ -68,7 +125,7 @@ const SHAPES: {
 // Must match the CSS custom property --fs-line-col in index.css
 const LINE_COL = "3rem";
 
-export function FreakyShiki() {
+export function Container() {
   const {
     theme,
     setTheme,
@@ -85,7 +142,23 @@ export function FreakyShiki() {
   const [lang, setLang] = useState("typescript");
   const [renderedHtml, setRenderedHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialCode, setInitialCode] = useState(() => ({
+    ...LANG_PLACEHOLDER,
+  }));
   const textRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleLangChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const newLang = e.target.value;
+      if (textRef.current) {
+        setInitialCode((prev) => ({ ...prev, [lang]: textRef.current!.value }));
+        textRef.current.value =
+          initialCode[newLang] ?? LANG_PLACEHOLDER[newLang] ?? "";
+      }
+      setLang(newLang);
+    },
+    [lang, initialCode],
+  );
 
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -93,7 +166,10 @@ export function FreakyShiki() {
   useEffect(() => {
     if (!colorPickerOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(e.target as Node)
+      ) {
         setColorPickerOpen(false);
       }
     };
@@ -179,35 +255,28 @@ export function FreakyShiki() {
         <div className="fs-header-left">
           {/* Color picker */}
           <div className="fs-popover-anchor" ref={popoverRef}>
-            <button
-              className="fs-color-trigger"
-              style={{ backgroundColor: baseColor }}
+            <Button
               aria-label="Pick base color"
               onClick={() => setColorPickerOpen((o) => !o)}
-            />
+            >
+              <span
+                className="fs-color-swatch"
+                style={{ backgroundColor: baseColor }}
+              ></span>
+              <span className="fs-title">{baseColor}</span>
+            </Button>
             {colorPickerOpen && (
               <div className="fs-popover-content">
                 <HexColorPicker color={baseColor} onChange={setBaseColor} />
               </div>
             )}
           </div>
-          <span className="fs-title">{baseColor}</span>
         </div>
 
-        <div className="fs-header-right">
-          <Select
-            size="sm"
-            value={lang}
-            onChange={(e) => setLang(e.target.value)}
-            aria-label="Language"
-          >
-            {Object.entries(LANG_SHORT).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </Select>
+        <div className="fs-header-center"></div>
 
+        <div className="fs-header-right">
+          {/* Palette Options */}
           <Select
             size="lg"
             value={paletteKind}
@@ -223,25 +292,31 @@ export function FreakyShiki() {
             )}
           </Select>
 
+          <Separator />
+
           <ButtonGroup label="Palette shape">
             {SHAPES.map(({ value, Icon }) => (
               <IconButton
                 key={value}
+                variant="ghost"
                 aria-pressed={paletteStyle === value}
                 aria-label={value}
                 onClick={() => setPaletteStyle(value)}
+                className={paletteStyle === value ? "fs-btn-active" : ""}
               >
-                <Icon size={16} />
+                <Icon size={14} />
               </IconButton>
             ))}
           </ButtonGroup>
+
+          <Separator />
 
           <IconButton
             variant="ghost"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             aria-label="Toggle dark mode"
           >
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
           </IconButton>
         </div>
       </div>
@@ -252,19 +327,41 @@ export function FreakyShiki() {
         textRef={textRef}
         onChange={handleChange}
         lineCol={LINE_COL}
+        defaultValue={initialCode[lang] ?? LANG_PLACEHOLDER[lang]}
       />
 
       {/* Footer */}
       <div className="fs-footer">
-        <Button icon={<Wand size={14} />} onClick={formatCode}>
-          {loading ? "Formatting…" : "Format"}
-        </Button>
-        <Button variant="primary" icon={<Copy size={14} />} onClick={copy}>
-          Copy
-        </Button>
-        <Button icon={<Download size={14} />} onClick={downloadJson}>
-          Download JSON
-        </Button>
+        <div className="fs-footer-left">
+          {/* Lang selector */}
+          <Select
+            size="sm"
+            value={lang}
+            onChange={handleLangChange}
+            aria-label="Language"
+          >
+            {Object.entries(LANG_SHORT).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </Select>
+
+          <Separator />
+
+          <IconButton variant="ghost" aria-label="Format" onClick={formatCode}>
+            <Wand size={14} />
+          </IconButton>
+        </div>
+
+        <div className="fs-footer-right">
+          <Button icon={<Download size={14} />} onClick={downloadJson}>
+            Download Theme
+          </Button>
+          <Button variant="primary" icon={<Copy size={14} />} onClick={copy}>
+            Copy Snippet
+          </Button>
+        </div>
       </div>
     </div>
   );

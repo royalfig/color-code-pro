@@ -7,9 +7,10 @@ interface EditorProps {
   textRef: RefObject<HTMLTextAreaElement | null>;
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   lineCol: string;
+  defaultValue?: string;
 }
 
-export function Editor({ editorBg, renderedHtml, textRef, onChange, lineCol }: EditorProps) {
+export function Editor({ editorBg, renderedHtml, textRef, onChange, lineCol, defaultValue }: EditorProps) {
   return (
     <div
       className="fs-editor"
@@ -30,6 +31,7 @@ export function Editor({ editorBg, renderedHtml, textRef, onChange, lineCol }: E
         spellCheck={false}
         className="fs-editor-textarea"
         style={{ paddingLeft: `calc(${lineCol} + 1rem)` }}
+        defaultValue={defaultValue}
       />
     </div>
   );
