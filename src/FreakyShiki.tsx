@@ -1,12 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Popover } from "radix-ui";
 import { HexColorPicker } from "react-colorful";
 import { format } from "prettier";
 import prettierBabel from "prettier/plugins/babel";
@@ -31,7 +22,7 @@ import { highlightCode } from "./lib/shiki";
 import type { ThemeRegistration } from "shiki";
 import { useTheme } from "./hooks/useTheme";
 import type { PaletteKind, PaletteStyle } from "./types";
-import { ButtonGroup } from "./components/ui/button-group";
+import "./FreakyShiki.css";
 
 const LANG_SHORT: Record<string, string> = {
   typescript: "TS",
@@ -63,7 +54,7 @@ const PALETTE_LABELS: Record<PaletteKind, string> = {
 
 const SHAPES: {
   value: PaletteStyle;
-  Icon: React.FC<{ className?: string }>;
+  Icon: React.FC<{ size?: number }>;
 }[] = [
   { value: "square", Icon: Square },
   { value: "triangle", Icon: Triangle },
@@ -92,6 +83,20 @@ export function FreakyShiki() {
   const [renderedHtml, setRenderedHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const textRef = useRef<HTMLTextAreaElement>(null);
+
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!colorPickerOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        setColorPickerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [colorPickerOpen]);
 
   const editorBg = activeTheme.colors["editor.background"];
 
@@ -165,96 +170,87 @@ export function FreakyShiki() {
   }, [activeTheme, resolvedTheme]);
 
   return (
-    <div className="rounded-xl bg-card shadow-lg overflow-hidden">
+    <div className="fs-card">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 border-b">
-        <div className="flex items-center gap-3">
+      <div className="fs-header">
+        <div className="fs-header-left">
           {/* Color picker */}
-          <Popover.Root>
-            <Popover.Trigger asChild>
-              <button
-                className="h-6 w-6 rounded-full border border-border shadow-sm shrink-0 cursor-pointer"
-                style={{ backgroundColor: baseColor }}
-                aria-label="Pick base color"
-              />
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content
-                sideOffset={8}
-                className="z-50 rounded-lg shadow-lg p-2 bg-popover border border-border"
-              >
+          <div className="fs-popover-anchor" ref={popoverRef}>
+            <button
+              className="fs-color-trigger"
+              style={{ backgroundColor: baseColor }}
+              aria-label="Pick base color"
+              onClick={() => setColorPickerOpen((o) => !o)}
+            />
+            {colorPickerOpen && (
+              <div className="fs-popover-content">
                 <HexColorPicker color={baseColor} onChange={setBaseColor} />
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
-          <span className="italic font-serif text-lg select-none">
-            Freaky Shiki
-          </span>
+              </div>
+            )}
+          </div>
+          <span className="fs-title">Freaky Shiki</span>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="fs-header-right">
           {/* Language */}
-          <Select value={lang} onValueChange={setLang}>
-            <SelectTrigger className="h-6 w-20 text-xs font-medium uppercase tracking-wider">
-              <SelectValue>{LANG_SHORT[lang]}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(LANG_SHORT).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <select
+            className="fs-select fs-select--lang"
+            value={lang}
+            onChange={(e) => setLang(e.target.value)}
+            aria-label="Language"
+          >
+            {Object.entries(LANG_SHORT).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
 
           {/* Palette kind */}
-          <Select
+          <select
+            className="fs-select fs-select--palette"
             value={paletteKind}
-            onValueChange={(v) => setPaletteKind(v as PaletteKind)}
+            onChange={(e) => setPaletteKind(e.target.value as PaletteKind)}
+            aria-label="Palette kind"
           >
-            <SelectTrigger className="w-36 text-xs font-medium uppercase tracking-wider">
-              <SelectValue>{PALETTE_LABELS[paletteKind]}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.entries(PALETTE_LABELS) as [PaletteKind, string][]).map(
-                ([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ),
-              )}
-            </SelectContent>
-          </Select>
+            {(Object.entries(PALETTE_LABELS) as [PaletteKind, string][]).map(
+              ([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ),
+            )}
+          </select>
 
           {/* Shape buttons */}
-          <ButtonGroup className="flex items-center">
+          <div className="fs-shape-group" role="group" aria-label="Palette shape">
             {SHAPES.map(({ value, Icon }) => (
-              <Button
+              <button
                 key={value}
-                variant={paletteStyle === value ? "secondary" : "outline"}
-                size="icon"
-                onClick={() => setPaletteStyle(value)}
+                className="fs-btn-icon"
+                aria-pressed={paletteStyle === value}
                 aria-label={value}
+                onClick={() => setPaletteStyle(value)}
               >
-                <Icon className="h-4 w-4" />
-              </Button>
+                <Icon size={16} />
+              </button>
             ))}
-          </ButtonGroup>
+          </div>
 
           {/* Dark/light toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
+            className="fs-btn-ghost"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             aria-label="Toggle dark mode"
           >
-            {theme === "dark" ? <Sun /> : <Moon />}
-          </Button>
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
         </div>
       </div>
 
       {/* Editor */}
       <div
-        className="relative min-h-60 font-mono text-sm leading-6"
+        className="fs-editor"
         style={
           {
             backgroundColor: editorBg,
@@ -263,42 +259,32 @@ export function FreakyShiki() {
         }
       >
         <div
-          className="relative w-full h-full p-4 [&_.shiki]:m-0"
+          className="fs-editor-preview"
           dangerouslySetInnerHTML={{ __html: renderedHtml || "" }}
         />
         <textarea
           ref={textRef}
           onChange={handleChange}
           spellCheck={false}
-          className="absolute inset-0 w-full h-full z-10 bg-transparent text-transparent caret-primary resize-none font-mono text-sm leading-6 p-4"
+          className="fs-editor-textarea"
           style={{ paddingLeft: `calc(${LINE_COL} + 1rem)` }}
         />
       </div>
 
       {/* Footer */}
-      <div className="flex justify-end gap-2 px-5 py-3 border-t">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={formatCode}
-          className="gap-1.5"
-        >
-          <Wand className="h-3.5 w-3.5" />
+      <div className="fs-footer">
+        <button className="fs-btn" onClick={formatCode}>
+          <Wand size={14} />
           {loading ? "Formatting…" : "Format"}
-        </Button>
-        <Button size="sm" onClick={copy} className="gap-1.5">
-          <Copy className="h-3.5 w-3.5" />
+        </button>
+        <button className="fs-btn fs-btn-primary" onClick={copy}>
+          <Copy size={14} />
           Copy
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={downloadJson}
-          className="gap-1.5"
-        >
-          <Download className="h-3.5 w-3.5" />
+        </button>
+        <button className="fs-btn" onClick={downloadJson}>
+          <Download size={14} />
           Download JSON
-        </Button>
+        </button>
       </div>
     </div>
   );

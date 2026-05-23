@@ -1,46 +1,8 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "reset.css";
 
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: "Geist Variable", sans-serif;
+:root {
   --radius: 0.625rem;
 
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -50,37 +12,10 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
-  --background: var(--color-surface);
-  --foreground: var(--color-on-surface);
-  --card: var(--color-container);
-  --card-foreground: var(--color-on-surface-variant);
-  --popover: var(--color-surface);
-  --popover-foreground: var(--color-on-surface);
-  --primary: var(--color-primary);
-  --primary-foreground: var(--color-on-primary);
-  --secondary: var(--color-secondary);
-  --secondary-foreground: var(--color-on-secondary);
-  --muted: var(--color-container-sunken);
-  --muted-foreground: var(--color-on-surface-variant);
-  --accent: var(--color-primary-container);
-  --accent-foreground: var(--color-on-primary-container);
-  --destructive: var(--color-error);
-  --border: var(--color-outline-variant);
-  --input: var(--color-on-surface-variant);
-  --ring: var(--color-outline-variant);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
+body {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: montreal, sans-serif;
 }
 
 /* Reset default <pre> margin so Shiki output sits flush in its container */
@@ -99,10 +34,43 @@
   color: color-mix(in srgb, currentColor 35%, transparent);
 }
 
-textarea {
-  resize: none;
+.container {
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
 }
 
-button {
-  cursor: pointer;
+code,
+pre {
+  font-family: code, monospace;
+}
+
+@font-face {
+  font-family: montreal;
+  src: url("./assets/PPNeueMontreal-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  font-style: italic;
+  src: url("./assets/PPNeueMontrealMono-RegularItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  font-weight: bold;
+  src: url("./assets/PPNeueMontrealMono-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  font-weight: bold;
+  font-style: italic;
+  src: url("./assets/PPNeueMontrealMono-BoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: code;
+  src: url("./assets/PPNeueMontrealMono-Regular.woff2") format("woff2");
 }
