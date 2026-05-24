@@ -10,7 +10,14 @@ interface EditorProps {
   defaultValue?: string;
 }
 
-export function Editor({ editorBg, renderedHtml, textRef, onChange, lineCol, defaultValue }: EditorProps) {
+export function Editor({
+  editorBg,
+  renderedHtml,
+  textRef,
+  onChange,
+  lineCol,
+  defaultValue,
+}: EditorProps) {
   return (
     <div
       className="fs-editor"
@@ -26,6 +33,7 @@ export function Editor({ editorBg, renderedHtml, textRef, onChange, lineCol, def
         dangerouslySetInnerHTML={{ __html: renderedHtml || "" }}
       />
       <textarea
+        id="fs-editor-textarea"
         ref={textRef}
         onChange={onChange}
         spellCheck={false}

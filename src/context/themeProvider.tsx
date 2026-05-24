@@ -56,14 +56,17 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("baseColor", baseColor);
   }, [baseColor]);
 
-  const themePair = useMemo(() => {
-    const palette = createPalettes(baseColor, paletteKind, paletteStyle, {
+  const palette = useMemo(() => {
+    return createPalettes(baseColor, paletteKind, paletteStyle, {
       space: "oklch",
       format: "hex",
     });
+  }, [baseColor, paletteKind, paletteStyle]);
+
+  const themePair = useMemo(() => {
     const base = palette.find((c) => c.isBase)!;
     return generateCodeThemePair(base.color, palette, paletteKind, paletteStyle);
-  }, [baseColor, paletteKind, paletteStyle]);
+  }, [palette, paletteKind, paletteStyle]);
 
   const activeTheme =
     resolvedTheme === "dark" ? themePair.dark : themePair.light;
@@ -93,6 +96,41 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     if (existing) existing.replaceWith(styleEl);
     else document.head.append(styleEl);
   }, [baseColor, paletteKind, paletteStyle, resolvedTheme]);
+
+  useLayoutEffect(() => {
+    const size = 64;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const colors = palette.map((c) => c.cssValue);
+    const count = Math.min(colors.length, 5);
+    const pad = 4;
+    const innerSize = size - pad * 2;
+    const bandH = innerSize / count;
+
+    ctx.fillStyle = "#12121f";
+    ctx.beginPath();
+    ctx.roundRect(0, 0, size, size, 12);
+    ctx.fill();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(pad, pad, innerSize, innerSize, 8);
+    ctx.clip();
+
+    for (let i = 0; i < count; i++) {
+      ctx.fillStyle = colors[i];
+      ctx.fillRect(pad, pad + i * bandH, innerSize, bandH);
+    }
+
+    ctx.restore();
+
+    const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (link) link.href = canvas.toDataURL("image/png");
+  }, [palette]);
 
   return (
     <ThemeContext.Provider

@@ -139,7 +139,13 @@ export function Container() {
     resolvedTheme,
   } = useTheme();
 
-  const [lang, setLang] = useState("typescript");
+  const [lang, setLang] = useState(
+    () => localStorage.getItem("lang") || "typescript",
+  );
+
+  useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
   const [renderedHtml, setRenderedHtml] = useState<string | null>(null);
   const savedCode = useRef<Record<string, string>>({ ...LANG_PLACEHOLDER });
   const textRef = useRef<HTMLTextAreaElement>(null);
@@ -302,6 +308,7 @@ export function Container() {
         <div className="fs-header-right">
           {/* Palette Options */}
           <Select
+            id="fs-palette-kind"
             size="lg"
             value={paletteKind}
             onChange={(e) => setPaletteKind(e.target.value as PaletteKind)}
@@ -359,6 +366,7 @@ export function Container() {
         <div className="fs-footer-left">
           {/* Lang selector */}
           <Select
+            id="fs-lang-select"
             size="sm"
             value={lang}
             onChange={handleLangChange}
