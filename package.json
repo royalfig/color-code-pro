@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fontsource-variable/geist": "^5.2.9",
     "@royalfig/color-palette-pro": "^2.2.0",
     "@shikijs/langs": "^4.1.0",
     "@shikijs/themes": "^4.1.0",

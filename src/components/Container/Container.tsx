@@ -141,23 +141,21 @@ export function Container() {
 
   const [lang, setLang] = useState("typescript");
   const [renderedHtml, setRenderedHtml] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [initialCode, setInitialCode] = useState(() => ({
-    ...LANG_PLACEHOLDER,
-  }));
+  const savedCode = useRef<Record<string, string>>({ ...LANG_PLACEHOLDER });
   const textRef = useRef<HTMLTextAreaElement>(null);
+  const highlightSerial = useRef(0);
 
   const handleLangChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newLang = e.target.value;
       if (textRef.current) {
-        setInitialCode((prev) => ({ ...prev, [lang]: textRef.current!.value }));
+        savedCode.current[lang] = textRef.current.value;
         textRef.current.value =
-          initialCode[newLang] ?? LANG_PLACEHOLDER[newLang] ?? "";
+          savedCode.current[newLang] ?? LANG_PLACEHOLDER[newLang] ?? "";
       }
       setLang(newLang);
     },
-    [lang, initialCode],
+    [lang],
   );
 
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
@@ -181,12 +179,13 @@ export function Container() {
 
   const doHighlight = useCallback(
     async (code: string) => {
+      const serial = ++highlightSerial.current;
       const html = await highlightCode(
         code,
         lang,
         activeTheme as ThemeRegistration,
       );
-      if (html) setRenderedHtml(html);
+      if (html && serial === highlightSerial.current) setRenderedHtml(html);
     },
     [lang, activeTheme],
   );
@@ -209,7 +208,6 @@ export function Container() {
     const parser = LANG_PRETTIER[lang];
     if (!parser) return;
     try {
-      setLoading(true);
       const formatted = await format(textRef.current.value, {
         parser,
         plugins: [
@@ -225,8 +223,6 @@ export function Container() {
       await doHighlight(formatted);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   }, [lang, doHighlight]);
 
@@ -327,7 +323,7 @@ export function Container() {
         textRef={textRef}
         onChange={handleChange}
         lineCol={LINE_COL}
-        defaultValue={initialCode[lang] ?? LANG_PLACEHOLDER[lang]}
+        defaultValue={LANG_PLACEHOLDER[lang]}
       />
 
       {/* Footer */}

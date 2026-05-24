@@ -35,7 +35,11 @@
 }
 
 body {
-  background: var(--color-surface);
+  background: linear-gradient(
+    to bottom,
+    var(--color-surface),
+    var(--color-container-overlay)
+  );
   color: var(--color-on-surface);
   font-family: montreal, sans-serif;
 }
