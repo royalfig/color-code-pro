@@ -50,7 +50,7 @@
   transition: background 120ms;
 }
 .fs-btn-ghost:hover {
-  background: var(--color-container);
+  background: var(--color-container-overlay);
 }
 .fs-btn-ghost:focus-visible {
   outline: 2px solid var(--color-primary);

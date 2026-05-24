@@ -160,6 +160,24 @@ export function Container() {
 
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const hexInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (hexInputRef.current && document.activeElement !== hexInputRef.current) {
+      hexInputRef.current.value = baseColor;
+    }
+  }, [baseColor]);
+
+  const handleHexInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const val = e.target.value;
+      const normalized = val.startsWith("#") ? val : `#${val}`;
+      if (/^#[0-9a-fA-F]{6}$/.test(normalized)) {
+        setBaseColor(normalized);
+      }
+    },
+    [setBaseColor],
+  );
 
   useEffect(() => {
     if (!colorPickerOpen) return;
@@ -264,6 +282,16 @@ export function Container() {
             {colorPickerOpen && (
               <div className="fs-popover-content">
                 <HexColorPicker color={baseColor} onChange={setBaseColor} />
+                <input
+                  ref={hexInputRef}
+                  className="fs-color-input"
+                  type="text"
+                  defaultValue={baseColor}
+                  onChange={handleHexInput}
+                  spellCheck={false}
+                  maxLength={7}
+                  aria-label="Hex color value"
+                />
               </div>
             )}
           </div>
