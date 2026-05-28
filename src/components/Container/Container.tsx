@@ -2,12 +2,16 @@ import { Editor } from "@/components/Editor/Editor";
 import { Select } from "@/components/Select/Select";
 import { Separator } from "@/components/Separator/Separator";
 
+import baseCss from "@/lib/base.css?raw";
+import baseJs from "@/lib/base.js?raw";
+
 import {
   Circle,
   Copy,
   Diamond,
   Download,
   Moon,
+  Settings,
   Square,
   Sun,
   Triangle,
@@ -148,6 +152,7 @@ export function Container() {
   }, [lang]);
   const [renderedHtml, setRenderedHtml] = useState<string | null>(null);
   const savedCode = useRef<Record<string, string>>({ ...LANG_PLACEHOLDER });
+  const userEdited = useRef(false);
   const textRef = useRef<HTMLTextAreaElement>(null);
   const highlightSerial = useRef(0);
 
@@ -156,8 +161,10 @@ export function Container() {
       const newLang = e.target.value;
       if (textRef.current) {
         savedCode.current[lang] = textRef.current.value;
-        textRef.current.value =
-          savedCode.current[newLang] ?? LANG_PLACEHOLDER[newLang] ?? "";
+        if (!userEdited.current) {
+          textRef.current.value =
+            savedCode.current[newLang] ?? LANG_PLACEHOLDER[newLang] ?? "";
+        }
       }
       setLang(newLang);
     },
@@ -167,6 +174,9 @@ export function Container() {
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
   const hexInputRef = useRef<HTMLInputElement>(null);
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsPopoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (hexInputRef.current && document.activeElement !== hexInputRef.current) {
@@ -199,6 +209,20 @@ export function Container() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [colorPickerOpen]);
 
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        settingsPopoverRef.current &&
+        !settingsPopoverRef.current.contains(e.target as Node)
+      ) {
+        setSettingsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [settingsOpen]);
+
   const editorBg = activeTheme.colors["editor.background"];
 
   const doHighlight = useCallback(
@@ -222,6 +246,7 @@ export function Container() {
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      userEdited.current = true;
       doHighlight(e.target.value);
     },
     [doHighlight],
@@ -254,6 +279,21 @@ export function Container() {
     if (!renderedHtml) return;
     navigator.clipboard.writeText(codeWrapper({ lang, renderedHtml }));
   }, [renderedHtml, lang]);
+
+  const downloadFile = useCallback(
+    (content: string, filename: string, mimeType: string) => {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },
+    [],
+  );
 
   const downloadJson = useCallback(() => {
     const json = JSON.stringify(activeTheme, null, 2);
@@ -303,8 +343,6 @@ export function Container() {
           </div>
         </div>
 
-        <div className="fs-header-center"></div>
-
         <div className="fs-header-right">
           {/* Palette Options */}
           <Select
@@ -349,6 +387,42 @@ export function Container() {
           >
             {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
           </IconButton>
+
+          <Separator />
+
+          <div className="fs-popover-anchor" ref={settingsPopoverRef}>
+            <IconButton
+              variant="ghost"
+              onClick={() => setSettingsOpen((o) => !o)}
+              aria-label="Settings"
+            >
+              <Settings size={14} />
+            </IconButton>
+            {settingsOpen && (
+              <div className="fs-popover-content fs-settings-popover">
+                <Button
+                  icon={<Download size={14} />}
+                  onClick={() =>
+                    downloadFile(baseCss, "freaky-shiki-base.css", "text/css")
+                  }
+                >
+                  Download CSS
+                </Button>
+                <Button
+                  icon={<Download size={14} />}
+                  onClick={() =>
+                    downloadFile(
+                      baseJs,
+                      "freaky-shiki-base.js",
+                      "application/javascript",
+                    )
+                  }
+                >
+                  Download JS
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -402,4 +476,4 @@ export function Container() {
 type CodeWrapperType = { lang: string; renderedHtml: string };
 
 const codeWrapper = ({ lang, renderedHtml }: CodeWrapperType) =>
-  `<div class="s-code"><div class="s-code-nav"><span>${lang}</span><button aria-label="Copy code" class="s-code-copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6ZM7 11H13V13H7V11ZM7 15H13V17H7V15Z"></path></svg></button></div>${renderedHtml}</div>`;
+  `<div class="fs-code"><div class="fs-code-nav"><span>${lang}</span><button aria-label="Copy code" class="fs-code-copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6ZM7 11H13V13H7V11ZM7 15H13V17H7V15Z"></path></svg></button></div>${renderedHtml}</div>`;
