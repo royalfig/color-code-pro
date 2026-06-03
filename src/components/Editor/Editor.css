@@ -4,7 +4,23 @@
   font-family: code, monospace;
   font-size: 0.875rem;
   line-height: 1.5rem;
+  max-width: 100%;
+  overflow: auto;
+  aspect-ratio: 2.5;
+  height: auto;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
 }
+
+.fs-editor-preview,
+.fs-editor-textarea {
+  grid-column: 1;
+  grid-row: 1;
+  overflow: clip;
+}
+
 .fs-editor-preview {
   font-family: code, monospace;
   position: relative;
@@ -12,9 +28,10 @@
   height: 100%;
   padding: 1rem;
 }
+
 .fs-editor-textarea {
-  position: absolute;
-  inset: 0;
+  /*position: absolute;
+  inset: 0;*/
   width: 100%;
   height: 100%;
   z-index: 10;
@@ -28,4 +45,5 @@
   padding: 1rem;
   border: none;
   outline: none;
+  white-space: pre;
 }

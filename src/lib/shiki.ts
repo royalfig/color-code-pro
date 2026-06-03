@@ -31,5 +31,5 @@ export async function highlightCode(
   theme: ThemeRegistration,
 ) {
   const highlighter = await highlighterPromise;
-  return highlighter.codeToHtml(code, { lang, theme, transformers: [lineNumbers] });
+  return highlighter.codeToHtml(code, { lang, theme });
 }

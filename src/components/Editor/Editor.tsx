@@ -15,7 +15,7 @@ export function Editor({
   renderedHtml,
   textRef,
   onChange,
-  lineCol,
+
   defaultValue,
 }: EditorProps) {
   return (
@@ -24,7 +24,6 @@ export function Editor({
       style={
         {
           backgroundColor: editorBg,
-          "--fs-line-col": lineCol,
         } as React.CSSProperties
       }
     >
@@ -38,7 +37,6 @@ export function Editor({
         onChange={onChange}
         spellCheck={false}
         className="fs-editor-textarea"
-        style={{ paddingLeft: `calc(${lineCol} + 1rem)` }}
         defaultValue={defaultValue}
       />
     </div>
