@@ -18,12 +18,6 @@ const highlighterPromise = createHighlighterCore({
   engine: createJavaScriptRegexEngine(),
 });
 
-const lineNumbers = {
-  name: "line-numbers",
-  line(node: any, line: number) {
-    node.properties["data-line"] = String(line).padStart(2, "0");
-  },
-};
 
 export async function highlightCode(
   code: string,

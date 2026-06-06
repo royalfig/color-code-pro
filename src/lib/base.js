@@ -13,9 +13,7 @@
       btn.addEventListener("click", async () => {
         const code = btn.parentElement?.nextElementSibling?.textContent;
 
-        if (!code) {
-          return;
-        }
+        if (!code || typeof code !== "string") return;
 
         try {
           await navigator.clipboard.writeText(code);

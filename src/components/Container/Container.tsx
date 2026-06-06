@@ -26,6 +26,7 @@ import prettierTypescript from "prettier/plugins/typescript";
 import prettierYaml from "prettier/plugins/yaml";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
+import { generateTheme, type ThemeFormat } from "@royalfig/color-palette-pro";
 import type { ThemeRegistration } from "shiki";
 import { useTheme } from "../../hooks/useTheme";
 import { highlightCode } from "../../lib/shiki";
@@ -116,6 +117,13 @@ const PALETTE_LABELS: Record<PaletteKind, string> = {
   spl: "Split Comp",
 };
 
+const FORMATS: { value: ThemeFormat; label: string; ext: string; mime: string }[] = [
+  { value: "vscode", label: "VS Code", ext: "json", mime: "application/json" },
+  { value: "zed", label: "Zed", ext: "json", mime: "application/json" },
+  { value: "iterm2", label: "iTerm2", ext: "itermcolors", mime: "application/xml" },
+  { value: "ghostty", label: "Ghostty", ext: "conf", mime: "text/plain" },
+];
+
 const SHAPES: {
   value: PaletteStyle;
   Icon: React.FC<{ size?: number }>;
@@ -141,7 +149,16 @@ export function Container() {
     setBaseColor,
     activeTheme,
     resolvedTheme,
+    palette,
   } = useTheme();
+
+  const [outputFormat, setOutputFormat] = useState<ThemeFormat>(
+    () => (localStorage.getItem("outputFormat") as ThemeFormat) || "vscode",
+  );
+
+  useEffect(() => {
+    localStorage.setItem("outputFormat", outputFormat);
+  }, [outputFormat]);
 
   const [lang, setLang] = useState(
     () => localStorage.getItem("lang") || "typescript",
@@ -295,18 +312,23 @@ export function Container() {
     [],
   );
 
-  const downloadJson = useCallback(() => {
-    const json = JSON.stringify(activeTheme, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `freaky-shiki-${resolvedTheme}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, [activeTheme, resolvedTheme]);
+  const downloadTheme = useCallback(() => {
+    const base = palette.find((c) => c.isBase)!;
+    const serialized = generateTheme(
+      base.color,
+      palette,
+      resolvedTheme === "dark",
+      paletteKind,
+      paletteStyle,
+      outputFormat,
+    );
+    const meta = FORMATS.find((f) => f.value === outputFormat)!;
+    downloadFile(
+      serialized,
+      `freaky-shiki-${resolvedTheme}.${meta.ext}`,
+      meta.mime,
+    );
+  }, [palette, resolvedTheme, paletteKind, paletteStyle, outputFormat, downloadFile]);
 
   return (
     <div className="fs-card">
@@ -400,6 +422,23 @@ export function Container() {
             </IconButton>
             {settingsOpen && (
               <div className="fs-popover-content fs-settings-popover">
+                <div className="fs-settings-section">
+                  <span className="fs-settings-label">Format</span>
+                  <ButtonGroup label="Output format">
+                    {FORMATS.map(({ value, label }) => (
+                      <IconButton
+                        key={value}
+                        variant="ghost"
+                        aria-pressed={outputFormat === value}
+                        aria-label={label}
+                        className={`fs-format-btn${outputFormat === value ? " fs-btn-active" : ""}`}
+                        onClick={() => setOutputFormat(value)}
+                      >
+                        {label}
+                      </IconButton>
+                    ))}
+                  </ButtonGroup>
+                </div>
                 <Button
                   icon={<Download size={14} />}
                   onClick={() =>
@@ -461,7 +500,7 @@ export function Container() {
         </div>
 
         <div className="fs-footer-right">
-          <Button icon={<Download size={14} />} onClick={downloadJson}>
+          <Button icon={<Download size={14} />} onClick={downloadTheme}>
             Download Theme
           </Button>
           <Button variant="primary" icon={<Copy size={14} />} onClick={copy}>
