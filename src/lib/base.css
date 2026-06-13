@@ -1,3 +1,18 @@
+/* Show only the variant matching the visitor's color scheme. */
+.fs-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fs-light {
+    display: none;
+  }
+
+  .fs-dark {
+    display: block;
+  }
+}
+
 .fs-code {
   pre {
     position: relative;

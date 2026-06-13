@@ -126,6 +126,29 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const activeTheme =
     resolvedTheme === "dark" ? themePair.dark : themePair.light;
 
+  // UI color variables for both schemes, as bare `--var: value;` declarations
+  // (wrapper "none"). The copy-snippet CSS scopes these to .fs-light / .fs-dark
+  // so a copied block is styled without the app's runtime injection.
+  const uiVarsPair = useMemo(() => {
+    const make = (isDarkMode: boolean) => {
+      const uiPalette = createPalettes(
+        baseColor,
+        paletteKind,
+        paletteStyle,
+        { space: "oklch", format: "hex" },
+        undefined,
+        true,
+        isDarkMode,
+      );
+      return generateCssVariables(uiPalette, {
+        format: "hex",
+        isUiMode: true,
+        wrapper: "none",
+      });
+    };
+    return { light: make(false), dark: make(true) };
+  }, [baseColor, paletteKind, paletteStyle]);
+
   useLayoutEffect(() => {
     const uiPalette = createPalettes(
       baseColor,
@@ -200,6 +223,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         baseColor,
         setBaseColor,
         activeTheme,
+        themePair,
+        uiVarsPair,
         palette,
       }}
     >
