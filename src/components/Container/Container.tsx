@@ -1,6 +1,7 @@
 import { Editor } from "@/components/Editor/Editor";
 import { Select } from "@/components/Select/Select";
 import { Separator } from "@/components/Separator/Separator";
+import { Radio } from "@/components/Radio/Radio";
 
 import baseCss from "@/lib/base.css?raw";
 import baseJs from "@/lib/base.js?raw";
@@ -111,16 +112,27 @@ print(greet("world"))`,
 const PALETTE_LABELS: Record<PaletteKind, string> = {
   ana: "Analogous",
   tas: "Tints & Shades",
+  ton: "Tones",
   tri: "Triadic",
   tet: "Tetradic",
   com: "Complementary",
   spl: "Split Comp",
 };
 
-const FORMATS: { value: ThemeFormat; label: string; ext: string; mime: string }[] = [
+const FORMATS: {
+  value: ThemeFormat;
+  label: string;
+  ext: string;
+  mime: string;
+}[] = [
   { value: "vscode", label: "VS Code", ext: "json", mime: "application/json" },
   { value: "zed", label: "Zed", ext: "json", mime: "application/json" },
-  { value: "iterm2", label: "iTerm2", ext: "itermcolors", mime: "application/xml" },
+  {
+    value: "iterm2",
+    label: "iTerm2",
+    ext: "itermcolors",
+    mime: "application/xml",
+  },
   { value: "ghostty", label: "Ghostty", ext: "conf", mime: "text/plain" },
 ];
 
@@ -155,6 +167,14 @@ export function Container() {
   const [outputFormat, setOutputFormat] = useState<ThemeFormat>(
     () => (localStorage.getItem("outputFormat") as ThemeFormat) || "vscode",
   );
+
+  const handleRadioChange = (ev: React.ChangeEvent<HTMLDivElement>) => {
+    const target = ev.target as HTMLInputElement;
+    console.log(target.type, target.value);
+    if (target.type === "radio") {
+      setOutputFormat(target.value as ThemeFormat);
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem("outputFormat", outputFormat);
@@ -328,7 +348,14 @@ export function Container() {
       `freaky-shiki-${resolvedTheme}.${meta.ext}`,
       meta.mime,
     );
-  }, [palette, resolvedTheme, paletteKind, paletteStyle, outputFormat, downloadFile]);
+  }, [
+    palette,
+    resolvedTheme,
+    paletteKind,
+    paletteStyle,
+    outputFormat,
+    downloadFile,
+  ]);
 
   return (
     <div className="fs-card">
@@ -424,20 +451,17 @@ export function Container() {
               <div className="fs-popover-content fs-settings-popover">
                 <div className="fs-settings-section">
                   <span className="fs-settings-label">Format</span>
-                  <ButtonGroup label="Output format">
+
+                  <div onChange={handleRadioChange}>
                     {FORMATS.map(({ value, label }) => (
-                      <IconButton
-                        key={value}
-                        variant="ghost"
-                        aria-pressed={outputFormat === value}
-                        aria-label={label}
-                        className={`fs-format-btn${outputFormat === value ? " fs-btn-active" : ""}`}
-                        onClick={() => setOutputFormat(value)}
-                      >
-                        {label}
-                      </IconButton>
+                      <Radio
+                        value={value}
+                        label={label}
+                        name="output-format"
+                        defaultValue={outputFormat}
+                      />
                     ))}
-                  </ButtonGroup>
+                  </div>
                 </div>
                 <Button
                   icon={<Download size={14} />}

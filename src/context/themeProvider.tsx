@@ -22,9 +22,7 @@ function randomPleasingColor(): string {
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = lNorm - c / 2;
 
-  let r,
-    g,
-    b;
+  let r, g, b;
   if (h < 60) {
     r = c;
     g = x;
@@ -75,6 +73,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       setResolvedTheme(active);
       root.classList.remove("light", "dark");
       root.classList.add(active);
+
       localStorage.setItem("theme", theme);
     };
 
@@ -116,7 +115,12 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   const themePair = useMemo(() => {
     const base = palette.find((c) => c.isBase)!;
-    return generateCodeThemePair(base.color, palette, paletteKind, paletteStyle);
+    return generateCodeThemePair(
+      base.color,
+      palette,
+      paletteKind,
+      paletteStyle,
+    );
   }, [palette, paletteKind, paletteStyle]);
 
   const activeTheme =

@@ -79,7 +79,7 @@
   border: 1px solid oklch(from var(--color-outline) l c h / 0.25);
   background: var(--color-container);
   box-shadow: var(--shadow-elevation-high);
-  padding: 0.5rem;
+  padding: 0.75rem;
 }
 /* Hex input inside popover */
 .fs-color-input {
