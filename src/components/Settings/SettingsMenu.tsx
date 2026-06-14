@@ -6,7 +6,7 @@ import { FORMATS } from "@/lib/const";
 import { Menu } from "@base-ui/react/menu";
 import { generateTheme, type ThemeFormat } from "@royalfig/color-palette-pro";
 import { Download, Settings, Circle, ExternalLink } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 import "./SettingsMenu.css";
 
 function GitHubLogo() {
@@ -23,6 +23,42 @@ function GitHubLogo() {
           <rect width="98" height="96" fill="var(--color-surface)" />
         </clipPath>
       </defs>
+    </svg>
+  );
+}
+
+// Inline version of the dynamic favicon: stacked palette color bands clipped to
+// a rounded square. Mirrors the canvas favicon drawn in themeProvider.
+function PaletteMark({ colors, size = 18 }: { colors: string[]; size?: number }) {
+  const clipId = useId();
+  const bands = colors.slice(0, 5);
+  const pad = 4;
+  const inner = 64 - pad * 2;
+  const bandH = bands.length ? inner / bands.length : inner;
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      style={{ display: "block", flexShrink: 0 }}
+    >
+      <rect width="64" height="64" rx="12" fill="#12121f" />
+      <clipPath id={clipId}>
+        <rect x={pad} y={pad} width={inner} height={inner} rx="8" />
+      </clipPath>
+      <g clipPath={`url(#${clipId})`}>
+        {bands.map((color, i) => (
+          <rect
+            key={i}
+            x={pad}
+            y={pad + i * bandH}
+            width={inner}
+            height={bandH}
+            fill={color}
+          />
+        ))}
+      </g>
     </svg>
   );
 }
@@ -60,7 +96,7 @@ export function SettingsMenu() {
       scope(".fs-dark", uiVarsPair.dark),
       baseCss,
     ].join("\n\n");
-    downloadFile(css, "freaky-shiki-base.css", "text/css");
+    downloadFile(css, "color-code-base.css", "text/css");
   }, [uiVarsPair, downloadFile]);
 
   const downloadTheme = useCallback(
@@ -77,7 +113,7 @@ export function SettingsMenu() {
       const meta = FORMATS.find((f) => f.value === outputFormat)!;
       downloadFile(
         serialized,
-        `freaky-shiki-${resolvedTheme}.${meta.ext}`,
+        `color-code-${resolvedTheme}.${meta.ext}`,
         meta.mime,
       );
     },
@@ -101,7 +137,10 @@ export function SettingsMenu() {
           align="end"
         >
           <Menu.Popup className="fs-popup">
-            <p className="fs-menu-title">ColorCode Pro</p>
+            <p className="fs-menu-title">
+              <PaletteMark colors={palette.map((c) => c.cssValue)} />
+              ColorCode Pro
+            </p>
 
             <p className="fs-group-label">Snippet Base</p>
 
@@ -118,7 +157,7 @@ export function SettingsMenu() {
               onClick={() =>
                 downloadFile(
                   baseJs,
-                  "freaky-shiki-base.js",
+                  "color-code-base.js",
                   "application/javascript",
                 )
               }

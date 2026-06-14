@@ -390,9 +390,11 @@ CMD ["npm", "start"]`,
   },
 ];
 
-/** Dropdown labels, keyed by language id (registry order preserved). */
+/** Dropdown labels, keyed by language id, alphabetized by label for display. */
 export const LANG_SHORT: Record<string, string> = Object.fromEntries(
-  LANGUAGES.map((l) => [l.id, l.label]),
+  [...LANGUAGES]
+    .sort((a, b) => a.label.localeCompare(b.label, "en", { sensitivity: "base" }))
+    .map((l) => [l.id, l.label]),
 );
 
 /** Prettier parser per language id, for languages that support formatting. */

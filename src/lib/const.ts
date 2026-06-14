@@ -4,11 +4,11 @@ import { Circle, Diamond, Square, Triangle } from "lucide-react";
 
 export const PALETTE_LABELS: Record<PaletteKind, string> = {
   ana: "Analogous",
-  tas: "Tints & Shades",
-  tri: "Triadic",
-  tet: "Tetradic",
   com: "Complementary",
   spl: "Split Comp",
+  tri: "Triadic",
+  tet: "Tetradic",
+  tas: "Tints & Shades",
 };
 
 export const FORMATS: {
