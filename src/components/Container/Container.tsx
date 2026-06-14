@@ -1,153 +1,28 @@
 import { Editor } from "@/components/Editor/Editor";
-import { Select } from "@/components/Select/Select";
+
+import { LangSelect, PaletteKindSelect } from "@/components/Select/Select";
 import { Separator } from "@/components/Separator/Separator";
-import { Radio } from "@/components/Radio/Radio";
+import { SettingsMenu } from "@/components/Settings/SettingsMenu";
 
-import baseCss from "@/lib/base.css?raw";
-import baseJs from "@/lib/base.js?raw";
-
-import {
-  Circle,
-  Copy,
-  Diamond,
-  Download,
-  Moon,
-  Settings,
-  Square,
-  Sun,
-  Triangle,
-  Wand,
-} from "lucide-react";
+import { LINE_COL, SHAPES } from "@/lib/const";
+import { LANG_PLACEHOLDER, LANG_PRETTIER } from "@/lib/languages";
+import { Copy, Moon, Sun, Wand } from "lucide-react";
 import { format } from "prettier";
 import prettierBabel from "prettier/plugins/babel";
 import prettierEstree from "prettier/plugins/estree";
+import prettierGraphql from "prettier/plugins/graphql";
 import prettierHtml from "prettier/plugins/html";
+import prettierMarkdown from "prettier/plugins/markdown";
 import prettierPostcss from "prettier/plugins/postcss";
 import prettierTypescript from "prettier/plugins/typescript";
 import prettierYaml from "prettier/plugins/yaml";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { HexColorPicker } from "react-colorful";
-import { generateTheme, type ThemeFormat } from "@royalfig/color-palette-pro";
+import ColorPicker from "@/components/ColorPicker/ColorPicker";
 import type { ThemeRegistration } from "shiki";
 import { useTheme } from "../../hooks/useTheme";
 import { highlightCode } from "../../lib/shiki";
-import type { PaletteKind, PaletteStyle } from "../../types";
 import { Button, ButtonGroup, IconButton } from "../Button/Button";
 import "./Container.css";
-
-const LANG_SHORT: Record<string, string> = {
-  typescript: "TS",
-  tsx: "TSX",
-  javascript: "JS",
-  css: "CSS",
-  json: "JSON",
-  html: "HTML",
-  yaml: "YAML",
-  bash: "BASH",
-};
-
-const LANG_PRETTIER: Record<string, string> = {
-  typescript: "typescript",
-  tsx: "typescript",
-  javascript: "babel",
-  css: "css",
-  json: "json",
-  html: "html",
-  yaml: "yaml",
-};
-
-const LANG_PLACEHOLDER: Record<string, string> = {
-  typescript: `const greet = (name: string): string => {
-  return \`Hello, \${name}!\`;
-};
-
-console.log(greet("world"));`,
-  tsx: `function Greeting({ name }: { name: string }) {
-  return <h1>Hello, {name}!</h1>;
-}
-
-export default Greeting;`,
-  javascript: `const greet = (name) => {
-  return \`Hello, \${name}!\`;
-};
-
-console.log(greet("world"));`,
-  css: `.container {
-  display: flex;
-  gap: 1rem;
-  padding: 1.5rem;
-}`,
-  json: `{
-  "name": "my-app",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "vite"
-  }
-}`,
-  html: `<!doctype html>
-<html lang="en">
-  <head>
-    <title>Hello</title>
-  </head>
-  <body>
-    <h1>Hello, world!</h1>
-  </body>
-</html>`,
-  yaml: `name: my-app
-version: 1.0.0
-scripts:
-  dev: vite
-  build: tsc && vite build`,
-  bash: `#!/usr/bin/env bash
-set -e
-
-echo "Hello, world!"
-ls -la`,
-  python: `def greet(name: str) -> str:
-    return f"Hello, {name}!"
-
-print(greet("world"))`,
-};
-
-const PALETTE_LABELS: Record<PaletteKind, string> = {
-  ana: "Analogous",
-  tas: "Tints & Shades",
-  ton: "Tones",
-  tri: "Triadic",
-  tet: "Tetradic",
-  com: "Complementary",
-  spl: "Split Comp",
-};
-
-const FORMATS: {
-  value: ThemeFormat;
-  label: string;
-  ext: string;
-  mime: string;
-}[] = [
-  { value: "vscode", label: "VS Code", ext: "json", mime: "application/json" },
-  { value: "zed", label: "Zed", ext: "json", mime: "application/json" },
-  {
-    value: "iterm2",
-    label: "iTerm2",
-    ext: "itermcolors",
-    mime: "application/xml",
-  },
-  { value: "ghostty", label: "Ghostty", ext: "conf", mime: "text/plain" },
-];
-
-const SHAPES: {
-  value: PaletteStyle;
-  Icon: React.FC<{ size?: number }>;
-}[] = [
-  { value: "square", Icon: Square },
-  { value: "triangle", Icon: Triangle },
-  { value: "circle", Icon: Circle },
-  { value: "diamond", Icon: Diamond },
-];
-
-// Must match the CSS custom property --fs-line-col in index.css
-const LINE_COL = "3rem";
 
 export function Container() {
   const {
@@ -157,30 +32,9 @@ export function Container() {
     setPaletteKind,
     paletteStyle,
     setPaletteStyle,
-    baseColor,
-    setBaseColor,
     activeTheme,
     themePair,
-    uiVarsPair,
-    resolvedTheme,
-    palette,
   } = useTheme();
-
-  const [outputFormat, setOutputFormat] = useState<ThemeFormat>(
-    () => (localStorage.getItem("outputFormat") as ThemeFormat) || "vscode",
-  );
-
-  const handleRadioChange = (ev: React.ChangeEvent<HTMLDivElement>) => {
-    const target = ev.target as HTMLInputElement;
-    console.log(target.type, target.value);
-    if (target.type === "radio") {
-      setOutputFormat(target.value as ThemeFormat);
-    }
-  };
-
-  useEffect(() => {
-    localStorage.setItem("outputFormat", outputFormat);
-  }, [outputFormat]);
 
   const [lang, setLang] = useState(
     () => localStorage.getItem("lang") || "typescript",
@@ -196,8 +50,7 @@ export function Container() {
   const highlightSerial = useRef(0);
 
   const handleLangChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newLang = e.target.value;
+    (newLang: string) => {
       if (textRef.current) {
         savedCode.current[lang] = textRef.current.value;
         if (!userEdited.current) {
@@ -209,58 +62,6 @@ export function Container() {
     },
     [lang],
   );
-
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
-  const popoverRef = useRef<HTMLDivElement>(null);
-  const hexInputRef = useRef<HTMLInputElement>(null);
-
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const settingsPopoverRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (hexInputRef.current && document.activeElement !== hexInputRef.current) {
-      hexInputRef.current.value = baseColor;
-    }
-  }, [baseColor]);
-
-  const handleHexInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      const normalized = val.startsWith("#") ? val : `#${val}`;
-      if (/^#[0-9a-fA-F]{6}$/.test(normalized)) {
-        setBaseColor(normalized);
-      }
-    },
-    [setBaseColor],
-  );
-
-  useEffect(() => {
-    if (!colorPickerOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        popoverRef.current &&
-        !popoverRef.current.contains(e.target as Node)
-      ) {
-        setColorPickerOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [colorPickerOpen]);
-
-  useEffect(() => {
-    if (!settingsOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        settingsPopoverRef.current &&
-        !settingsPopoverRef.current.contains(e.target as Node)
-      ) {
-        setSettingsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [settingsOpen]);
 
   const editorBg = activeTheme.colors["editor.background"];
 
@@ -305,6 +106,8 @@ export function Container() {
           prettierTypescript,
           prettierHtml,
           prettierYaml,
+          prettierMarkdown,
+          prettierGraphql,
         ],
       });
       textRef.current.value = formatted;
@@ -327,109 +130,21 @@ export function Container() {
     );
   }, [lang, themePair]);
 
-  const downloadFile = useCallback(
-    (content: string, filename: string, mimeType: string) => {
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    },
-    [],
-  );
-
-  const downloadCss = useCallback(() => {
-    const scope = (selector: string, vars: string) =>
-      `${selector} {\n${vars.replace(/^/gm, "  ")}\n}`;
-    const css = [
-      scope(".fs-light", uiVarsPair.light),
-      scope(".fs-dark", uiVarsPair.dark),
-      baseCss,
-    ].join("\n\n");
-    downloadFile(css, "freaky-shiki-base.css", "text/css");
-  }, [uiVarsPair, downloadFile]);
-
-  const downloadTheme = useCallback(() => {
-    const base = palette.find((c) => c.isBase)!;
-    const serialized = generateTheme(
-      base.color,
-      palette,
-      resolvedTheme === "dark",
-      paletteKind,
-      paletteStyle,
-      outputFormat,
-    );
-    const meta = FORMATS.find((f) => f.value === outputFormat)!;
-    downloadFile(
-      serialized,
-      `freaky-shiki-${resolvedTheme}.${meta.ext}`,
-      meta.mime,
-    );
-  }, [
-    palette,
-    resolvedTheme,
-    paletteKind,
-    paletteStyle,
-    outputFormat,
-    downloadFile,
-  ]);
-
   return (
     <div className="fs-card">
       {/* Header */}
       <div className="fs-header">
         <div className="fs-header-left">
           {/* Color picker */}
-          <div className="fs-popover-anchor" ref={popoverRef}>
-            <Button
-              aria-label="Pick base color"
-              onClick={() => setColorPickerOpen((o) => !o)}
-            >
-              <span
-                className="fs-color-swatch"
-                style={{ backgroundColor: baseColor }}
-              ></span>
-              <span className="fs-title">{baseColor}</span>
-            </Button>
-            {colorPickerOpen && (
-              <div className="fs-popover-content">
-                <HexColorPicker color={baseColor} onChange={setBaseColor} />
-                <input
-                  ref={hexInputRef}
-                  className="fs-color-input"
-                  type="text"
-                  defaultValue={baseColor}
-                  onChange={handleHexInput}
-                  spellCheck={false}
-                  maxLength={7}
-                  aria-label="Hex color value"
-                />
-              </div>
-            )}
-          </div>
+          <ColorPicker />
         </div>
 
         <div className="fs-header-right">
-          {/* Palette Options */}
-          <Select
-            id="fs-palette-kind"
-            size="lg"
-            value={paletteKind}
-            onChange={(e) => setPaletteKind(e.target.value as PaletteKind)}
-            aria-label="Palette kind"
-          >
-            {(Object.entries(PALETTE_LABELS) as [PaletteKind, string][]).map(
-              ([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ),
-            )}
-          </Select>
+          {/* Palette kind */}
+          <PaletteKindSelect
+            paletteKind={paletteKind}
+            setPaletteKind={setPaletteKind}
+          />
 
           <Separator />
 
@@ -460,48 +175,7 @@ export function Container() {
 
           <Separator />
 
-          <div className="fs-popover-anchor" ref={settingsPopoverRef}>
-            <IconButton
-              variant="ghost"
-              onClick={() => setSettingsOpen((o) => !o)}
-              aria-label="Settings"
-            >
-              <Settings size={14} />
-            </IconButton>
-            {settingsOpen && (
-              <div className="fs-popover-content fs-settings-popover">
-                <div className="fs-settings-section">
-                  <span className="fs-settings-label">Format</span>
-
-                  <div onChange={handleRadioChange}>
-                    {FORMATS.map(({ value, label }) => (
-                      <Radio
-                        value={value}
-                        label={label}
-                        name="output-format"
-                        defaultValue={outputFormat}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <Button icon={<Download size={14} />} onClick={downloadCss}>
-                  Download CSS
-                </Button>
-                <Button
-                  icon={<Download size={14} />}
-                  onClick={() =>
-                    downloadFile(
-                      baseJs,
-                      "freaky-shiki-base.js",
-                      "application/javascript",
-                    )
-                  }
-                >
-                  Download JS
-                </Button>
-              </div>
-            )}
-          </div>
+          <SettingsMenu />
         </div>
       </div>
 
@@ -518,19 +192,7 @@ export function Container() {
       <div className="fs-footer">
         <div className="fs-footer-left">
           {/* Lang selector */}
-          <Select
-            id="fs-lang-select"
-            size="sm"
-            value={lang}
-            onChange={handleLangChange}
-            aria-label="Language"
-          >
-            {Object.entries(LANG_SHORT).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </Select>
+          <LangSelect handleLangChange={handleLangChange} lang={lang} />
 
           <Separator />
 
@@ -540,9 +202,6 @@ export function Container() {
         </div>
 
         <div className="fs-footer-right">
-          <Button icon={<Download size={14} />} onClick={downloadTheme}>
-            Download Theme
-          </Button>
           <Button variant="primary" icon={<Copy size={14} />} onClick={copy}>
             Copy Snippet
           </Button>

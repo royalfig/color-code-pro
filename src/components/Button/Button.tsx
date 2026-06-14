@@ -2,8 +2,9 @@ import { type ButtonHTMLAttributes } from "react";
 import "./Button.css";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "primary";
+  variant?: "default" | "primary" | "ghost";
   icon?: React.ReactNode;
+  content?: "start" | "center";
 }
 
 export function Button({
@@ -11,9 +12,16 @@ export function Button({
   icon,
   children,
   className,
+  content,
   ...props
 }: ButtonProps) {
-  const cls = ["fs-btn", variant === "primary" && "fs-btn-primary", className]
+  const cls = [
+    "fs-btn",
+    variant === "primary" && "fs-btn-primary",
+    variant === "ghost" && "fs-btn-ghost",
+    content === "center" ? "fs-center" : "fs-start",
+    className,
+  ]
     .filter(Boolean)
     .join(" ");
   return (
@@ -34,7 +42,10 @@ export function IconButton({
   className,
   ...props
 }: IconButtonProps) {
-  const cls = [variant === "ghost" ? "fs-btn-ghost" : "fs-btn-icon", className]
+  const cls = [
+    variant === "ghost" ? "fs-btn-icon-ghost" : "fs-btn-icon",
+    className,
+  ]
     .filter(Boolean)
     .join(" ");
   return (

@@ -70,3 +70,11 @@ pre {
   font-family: code;
   src: url("./assets/PPNeueMontrealMono-Regular.woff2") format("woff2");
 }
+
+.fs-start {
+  justify-content: start;
+}
+
+.fs-center {
+  justify-content: center;
+}
