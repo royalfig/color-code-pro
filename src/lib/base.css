@@ -1,19 +1,19 @@
-/* Show only the variant matching the visitor's color scheme. */
-.fs-dark {
+/* Show only the variant matching the visitor's color scheme. Adjust as needed for your app. */
+.cc-dark {
   display: none;
 }
 
 @media (prefers-color-scheme: dark) {
-  .fs-light {
+  .cc-light {
     display: none;
   }
 
-  .fs-dark {
+  .cc-dark {
     display: block;
   }
 }
 
-.fs-code {
+.cc-code {
   pre {
     position: relative;
     padding: var(--sp-12, 12px);
@@ -25,18 +25,22 @@
 
   code {
     font-size: var(--ft-xs, max(14px, 0.625rem));
-    font-family: var(--ft-mono), monospace;
+    font-family:
+      ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+      "DejaVu Sans Mono", monospace;
     line-height: 1.1;
   }
 }
 
-.fs-code-nav {
+.cc-code-nav {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--sp-12, 12px);
-  font-family: var(--ft-mono), monospace;
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
   font-size: var(--ft-xs, max(14px, 0.625rem));
   color: var(--color-on-surface-variant);
   text-transform: lowercase;
@@ -45,11 +49,15 @@
   border-radius: var(--br-md, 8px) var(--br-md, 8px) 0 0;
 }
 
-.fs-code-copy {
+.cc-code-copy {
   display: flex;
   gap: var(--sp-xs, 6px);
   align-items: center;
-  font-family: source-code, ui-monospace, mono;
+  width: 1rem;
+  height: 1rem;
+  font-family:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    "DejaVu Sans Mono", monospace;
   color: var(--color-on-surface-variant);
   text-transform: uppercase;
   opacity: 0.75;

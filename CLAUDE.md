@@ -22,7 +22,7 @@ Freaky Shiki is a browser-based code syntax highlighter UI that generates Shiki-
 1. `ThemeProvider` (`src/context/themeProvider.tsx`) is the single source of truth. It holds `baseColor`, `paletteKind` (`ana|tas|tri|tet|com|spl`), and `paletteStyle` (`square|triangle|circle|diamond`). All three are persisted to `localStorage`.
 2. On every change, `@royalfig/color-palette-pro` (external package) is called via `createPalettes` → `generateCodeThemePair` to produce a `{ light, dark }` `CodeThemeOutput` object (`activeTheme`). A second call to `generateCssVariables` writes UI color CSS custom properties directly into `<head>` as `#color-vars`.
 3. `FreakyShiki` (`src/components/Container/Container.tsx`) consumes `useTheme()` and owns editor state: selected language, textarea ref (uncontrolled), and rendered HTML. On each keystroke it calls `highlightCode` in `src/lib/shiki.ts`, which passes the code + `activeTheme` to the Shiki `createHighlighterCore` singleton.
-4. `Editor` (`src/components/Editor/Editor.tsx`) is a thin presentational component: a `<textarea>` overlaid on top of Shiki-rendered HTML via absolute positioning. The `--fs-line-col` CSS variable (hardcoded `3rem` in Container, must match `index.css`) controls line-number column width.
+4. `Editor` (`src/components/Editor/Editor.tsx`) is a thin presentational component: a `<textarea>` overlaid on top of Shiki-rendered HTML via absolute positioning. The `--cc-line-col` CSS variable (hardcoded `3rem` in Container, must match `index.css`) controls line-number column width.
 
 **Key details:**
 

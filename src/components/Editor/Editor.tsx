@@ -20,7 +20,7 @@ export function Editor({
 }: EditorProps) {
   return (
     <div
-      className="fs-editor"
+      className="cc-editor"
       style={
         {
           backgroundColor: editorBg,
@@ -28,15 +28,15 @@ export function Editor({
       }
     >
       <div
-        className="fs-editor-preview"
+        className="cc-editor-preview"
         dangerouslySetInnerHTML={{ __html: renderedHtml || "" }}
       />
       <textarea
-        id="fs-editor-textarea"
+        id="cc-editor-textarea"
         ref={textRef}
         onChange={onChange}
         spellCheck={false}
-        className="fs-editor-textarea"
+        className="cc-editor-textarea"
         defaultValue={defaultValue}
       />
     </div>

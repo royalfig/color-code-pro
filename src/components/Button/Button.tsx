@@ -16,10 +16,10 @@ export function Button({
   ...props
 }: ButtonProps) {
   const cls = [
-    "fs-btn",
-    variant === "primary" && "fs-btn-primary",
-    variant === "ghost" && "fs-btn-ghost",
-    content === "center" ? "fs-center" : "fs-start",
+    "cc-btn",
+    variant === "primary" && "cc-btn-primary",
+    variant === "ghost" && "cc-btn-ghost",
+    content === "center" ? "cc-center" : "cc-start",
     className,
   ]
     .filter(Boolean)
@@ -43,7 +43,7 @@ export function IconButton({
   ...props
 }: IconButtonProps) {
   const cls = [
-    variant === "ghost" ? "fs-btn-icon-ghost" : "fs-btn-icon",
+    variant === "ghost" ? "cc-btn-icon-ghost" : "cc-btn-icon",
     className,
   ]
     .filter(Boolean)
@@ -62,7 +62,7 @@ interface ButtonGroupProps {
 
 export function ButtonGroup({ children, label }: ButtonGroupProps) {
   return (
-    <div className="fs-shape-group" role="group" aria-label={label}>
+    <div className="cc-shape-group" role="group" aria-label={label}>
       {children}
     </div>
   );

@@ -1,4 +1,4 @@
-.fs-editor {
+.cc-editor {
   position: relative;
   min-height: 15rem;
   font-family: code, monospace;
@@ -14,14 +14,14 @@
   grid-template-rows: 1fr;
 }
 
-.fs-editor-preview,
-.fs-editor-textarea {
+.cc-editor-preview,
+.cc-editor-textarea {
   grid-column: 1;
   grid-row: 1;
   overflow: clip;
 }
 
-.fs-editor-preview {
+.cc-editor-preview {
   font-family: code, monospace;
   position: relative;
   width: 100%;
@@ -29,7 +29,7 @@
   padding: 1rem;
 }
 
-.fs-editor-textarea {
+.cc-editor-textarea {
   /*position: absolute;
   inset: 0;*/
   width: 100%;

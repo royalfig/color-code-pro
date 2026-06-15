@@ -32,21 +32,21 @@ export default function ColorPicker() {
         render={
           <Button aria-label="Pick base color">
             <span
-              className="fs-color-swatch"
+              className="cc-color-swatch"
               style={{ backgroundColor: baseColor }}
             ></span>
-            <span className="fs-title">{baseColor}</span>
+            <span className="cc-title">{baseColor}</span>
           </Button>
         }
       ></Popover.Trigger>
       <Popover.Portal>
         <Popover.Positioner sideOffset={8}>
-          <Popover.Popup className="fs-popup">
-            <div className="fs-popover-content">
+          <Popover.Popup className="cc-popup">
+            <div className="cc-popover-content">
               <HexColorPicker color={baseColor} onChange={setBaseColor} />
               <input
                 ref={hexInputRef}
-                className="fs-color-input"
+                className="cc-color-input"
                 type="text"
                 defaultValue={baseColor}
                 onChange={handleHexInput}

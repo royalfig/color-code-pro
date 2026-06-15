@@ -6,7 +6,7 @@ import { SettingsMenu } from "@/components/Settings/SettingsMenu";
 
 import { LINE_COL, SHAPES } from "@/lib/const";
 import { LANG_PLACEHOLDER, LANG_PRETTIER } from "@/lib/languages";
-import { Copy, Moon, Sun, Wand } from "lucide-react";
+import { Copy, Moon, Sun, Wand, Check } from "lucide-react";
 import { format } from "prettier";
 import prettierBabel from "prettier/plugins/babel";
 import prettierEstree from "prettier/plugins/estree";
@@ -38,6 +38,10 @@ export function Container() {
 
   const [lang, setLang] = useState(
     () => localStorage.getItem("lang") || "typescript",
+  );
+
+  const [copyButtonIconToUse, setCopyButtonIconToUse] = useState(
+    <Copy size={14} />,
   );
 
   useEffect(() => {
@@ -128,18 +132,22 @@ export function Container() {
     await navigator.clipboard.writeText(
       codeWrapper({ lang, lightHtml, darkHtml }),
     );
+    setCopyButtonIconToUse(<Check size={14} />);
+    setTimeout(() => {
+      setCopyButtonIconToUse(<Copy size={14} />);
+    }, 2000);
   }, [lang, themePair]);
 
   return (
-    <div className="fs-card">
+    <div className="cc-card">
       {/* Header */}
-      <div className="fs-header">
-        <div className="fs-header-left">
+      <div className="cc-header">
+        <div className="cc-header-left">
           {/* Color picker */}
           <ColorPicker />
         </div>
 
-        <div className="fs-header-right">
+        <div className="cc-header-right">
           {/* Palette kind */}
           <PaletteKindSelect
             paletteKind={paletteKind}
@@ -156,7 +164,7 @@ export function Container() {
                 aria-pressed={paletteStyle === value}
                 aria-label={value}
                 onClick={() => setPaletteStyle(value)}
-                className={paletteStyle === value ? "fs-btn-active" : ""}
+                className={paletteStyle === value ? "cc-btn-active" : ""}
               >
                 <Icon size={14} />
               </IconButton>
@@ -189,8 +197,8 @@ export function Container() {
       />
 
       {/* Footer */}
-      <div className="fs-footer">
-        <div className="fs-footer-left">
+      <div className="cc-footer">
+        <div className="cc-footer-left">
           {/* Lang selector */}
           <LangSelect handleLangChange={handleLangChange} lang={lang} />
 
@@ -201,8 +209,8 @@ export function Container() {
           </IconButton>
         </div>
 
-        <div className="fs-footer-right">
-          <Button variant="primary" icon={<Copy size={14} />} onClick={copy}>
+        <div className="cc-footer-right">
+          <Button variant="primary" icon={copyButtonIconToUse} onClick={copy}>
             Copy Snippet
           </Button>
         </div>
@@ -214,7 +222,7 @@ export function Container() {
 type CodeWrapperType = { lang: string; lightHtml: string; darkHtml: string };
 
 const codeBlock = (lang: string, renderedHtml: string) =>
-  `<div class="fs-code"><div class="fs-code-nav"><span>${lang}</span><button aria-label="Copy code" class="fs-code-copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6ZM7 11H13V13H7V11ZM7 15H13V17H7V15Z"></path></svg></button></div>${renderedHtml}</div>`;
+  `<div class="cc-code"><div class="cc-code-nav"><span>${lang}</span><button aria-label="Copy code" class="cc-code-copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.9998 6V3C6.9998 2.44772 7.44752 2 7.9998 2H19.9998C20.5521 2 20.9998 2.44772 20.9998 3V17C20.9998 17.5523 20.5521 18 19.9998 18H16.9998V20.9991C16.9998 21.5519 16.5499 22 15.993 22H4.00666C3.45059 22 3 21.5554 3 20.9991L3.0026 7.00087C3.0027 6.44811 3.45264 6 4.00942 6H6.9998ZM5.00242 8L5.00019 20H14.9998V8H5.00242ZM8.9998 6H16.9998V16H18.9998V4H8.9998V6ZM7 11H13V13H7V11ZM7 15H13V17H7V15Z"></path></svg></button></div>${renderedHtml}</div>`;
 
 const codeWrapper = ({ lang, lightHtml, darkHtml }: CodeWrapperType) =>
-  `<div class="fs-light">${codeBlock(lang, lightHtml)}</div><div class="fs-dark">${codeBlock(lang, darkHtml)}</div>`;
+  `<div class="cc-light">${codeBlock(lang, lightHtml)}</div><div class="cc-dark">${codeBlock(lang, darkHtml)}</div>`;

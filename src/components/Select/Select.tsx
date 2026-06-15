@@ -20,16 +20,16 @@ export function LangSelect({
   };
 
   return (
-    <div className="fs-field">
+    <div className="cc-field">
       <Select.Root
         items={LANG_SHORT}
         onValueChange={handleValChange}
         value={lang}
       >
-        {/*<Select.Label className="fs-select-label">{currentLabel}</Select.Label>*/}
-        <Select.Trigger className="fs-select-trigger">
+        {/*<Select.Label className="cc-select-label">{currentLabel}</Select.Label>*/}
+        <Select.Trigger className="cc-select-trigger">
           <Select.Value
-            className="fs-trigger-value"
+            className="cc-trigger-value"
             placeholder="Select language"
           />
           <Select.Icon>
@@ -38,27 +38,27 @@ export function LangSelect({
         </Select.Trigger>
         <Select.Portal>
           <Select.Positioner className="" sideOffset={4}>
-            <Select.Popup className="fs-popup fs-select-popup">
-              <Select.ScrollUpArrow className="fs-scroll-arrow">
+            <Select.Popup className="cc-popup cc-select-popup">
+              <Select.ScrollUpArrow className="cc-scroll-arrow">
                 <ChevronUp size={12} />
               </Select.ScrollUpArrow>
-              <Select.List className="fs-select-list">
+              <Select.List className="cc-select-list">
                 {Object.entries(LANG_SHORT).map(([value, label]) => (
                   <Select.Item
                     key={label}
                     value={value}
-                    className="fs-select-item"
+                    className="cc-select-item"
                   >
-                    <Select.ItemIndicator className="fs-list-indicator">
+                    <Select.ItemIndicator className="cc-list-indicator">
                       <Check size={"1em"} />
                     </Select.ItemIndicator>
-                    <Select.ItemText className="fs-list-text">
+                    <Select.ItemText className="cc-list-text">
                       {label}
                     </Select.ItemText>
                   </Select.Item>
                 ))}
               </Select.List>
-              <Select.ScrollDownArrow className="fs-scroll-arrow">
+              <Select.ScrollDownArrow className="cc-scroll-arrow">
                 <ChevronDown size={12} />
               </Select.ScrollDownArrow>
             </Select.Popup>
@@ -82,15 +82,15 @@ export function PaletteKindSelect({
   };
 
   return (
-    <div className="fs-field">
+    <div className="cc-field">
       <Select.Root
         items={PALETTE_LABELS}
         onValueChange={handleValChange}
         value={paletteKind}
       >
-        <Select.Trigger className="fs-select-trigger">
+        <Select.Trigger className="cc-select-trigger">
           <Select.Value
-            className="fs-trigger-value"
+            className="cc-trigger-value"
             placeholder="Palette kind"
           />
           <Select.Icon>
@@ -99,29 +99,29 @@ export function PaletteKindSelect({
         </Select.Trigger>
         <Select.Portal>
           <Select.Positioner className="" sideOffset={4}>
-            <Select.Popup className="fs-popup fs-select-popup">
-              <Select.ScrollUpArrow className="fs-scroll-arrow">
+            <Select.Popup className="cc-popup cc-select-popup">
+              <Select.ScrollUpArrow className="cc-scroll-arrow">
                 <ChevronUp size={12} />
               </Select.ScrollUpArrow>
-              <Select.List className="fs-select-list">
+              <Select.List className="cc-select-list">
                 {(
                   Object.entries(PALETTE_LABELS) as [PaletteKind, string][]
                 ).map(([value, label]) => (
                   <Select.Item
                     key={value}
                     value={value}
-                    className="fs-select-item"
+                    className="cc-select-item"
                   >
-                    <Select.ItemIndicator className="fs-list-indicator">
+                    <Select.ItemIndicator className="cc-list-indicator">
                       <Check size={"1em"} />
                     </Select.ItemIndicator>
-                    <Select.ItemText className="fs-list-text">
+                    <Select.ItemText className="cc-list-text">
                       {label}
                     </Select.ItemText>
                   </Select.Item>
                 ))}
               </Select.List>
-              <Select.ScrollDownArrow className="fs-scroll-arrow">
+              <Select.ScrollDownArrow className="cc-scroll-arrow">
                 <ChevronDown size={12} />
               </Select.ScrollDownArrow>
             </Select.Popup>

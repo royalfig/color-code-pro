@@ -71,10 +71,10 @@ pre {
   src: url("./assets/PPNeueMontrealMono-Regular.woff2") format("woff2");
 }
 
-.fs-start {
+.cc-start {
   justify-content: start;
 }
 
-.fs-center {
+.cc-center {
   justify-content: center;
 }

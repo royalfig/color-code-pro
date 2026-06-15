@@ -127,7 +127,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     resolvedTheme === "dark" ? themePair.dark : themePair.light;
 
   // UI color variables for both schemes, as bare `--var: value;` declarations
-  // (wrapper "none"). The copy-snippet CSS scopes these to .fs-light / .fs-dark
+  // (wrapper "none"). The copy-snippet CSS scopes these to .cc-light / .cc-dark
   // so a copied block is styled without the app's runtime injection.
   const uiVarsPair = useMemo(() => {
     const make = (isDarkMode: boolean) => {

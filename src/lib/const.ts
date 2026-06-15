@@ -38,5 +38,5 @@ export const SHAPES: {
   { value: "diamond", Icon: Diamond },
 ];
 
-// Must match the CSS custom property --fs-line-col in index.css
+// Must match the CSS custom property --cc-line-col in index.css
 export const LINE_COL = "3rem";

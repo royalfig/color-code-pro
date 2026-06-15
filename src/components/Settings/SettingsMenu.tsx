@@ -29,7 +29,13 @@ function GitHubLogo() {
 
 // Inline version of the dynamic favicon: stacked palette color bands clipped to
 // a rounded square. Mirrors the canvas favicon drawn in themeProvider.
-function PaletteMark({ colors, size = 18 }: { colors: string[]; size?: number }) {
+function PaletteMark({
+  colors,
+  size = 18,
+}: {
+  colors: string[];
+  size?: number;
+}) {
   const clipId = useId();
   const bands = colors.slice(0, 5);
   const pad = 4;
@@ -92,8 +98,8 @@ export function SettingsMenu() {
     const scope = (selector: string, vars: string) =>
       `${selector} {\n${vars.replace(/^/gm, "  ")}\n}`;
     const css = [
-      scope(".fs-light", uiVarsPair.light),
-      scope(".fs-dark", uiVarsPair.dark),
+      scope(".cc-light", uiVarsPair.light),
+      scope(".cc-dark", uiVarsPair.dark),
       baseCss,
     ].join("\n\n");
     downloadFile(css, "color-code-base.css", "text/css");
@@ -131,18 +137,18 @@ export function SettingsMenu() {
       ></Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner
-          className="fs-positioner"
+          className="cc-positioner"
           sideOffset={8}
           side="bottom"
           align="end"
         >
-          <Menu.Popup className="fs-popup">
-            <p className="fs-menu-title">
+          <Menu.Popup className="cc-popup">
+            <p className="cc-menu-title">
               <PaletteMark colors={palette.map((c) => c.cssValue)} />
               ColorCode Pro
             </p>
 
-            <p className="fs-group-label">Snippet Base</p>
+            <p className="cc-group-label">Snippet Base</p>
 
             <Button
               variant="ghost"
@@ -165,7 +171,7 @@ export function SettingsMenu() {
             >
               JS
             </Button>
-            <p className="fs-group-label">Theme</p>
+            <p className="cc-group-label">Theme</p>
 
             <Button
               variant="ghost"
@@ -199,10 +205,10 @@ export function SettingsMenu() {
               iTerm2
             </Button>
 
-            <p className="fs-group-label">Resources</p>
+            <p className="cc-group-label">Resources</p>
 
             <a
-              className="fs-settings-link"
+              className="cc-settings-link"
               target="_blank"
               href={`https://colorpalette.pro?color=${encodeURIComponent(baseColor)}&colorFormat=hex&paletteType=${paletteKind}&paletteStyle=${paletteStyle}`}
             >
@@ -217,9 +223,9 @@ export function SettingsMenu() {
               <ExternalLink size={"1em"} />
             </a>
             <a
-              className="fs-settings-link"
+              className="cc-settings-link"
               target="_blank"
-              href="https://github.com/royalfig/freaky-shiki"
+              href="https://github.com/royalfig/color-code-pro"
             >
               <span>
                 <GitHubLogo />

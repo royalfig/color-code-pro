@@ -1,4 +1,4 @@
-.fs-separator {
+.cc-separator {
   height: 1em;
   width: 1px;
   background-color: oklch(from var(--color-outline) l c h / 0.5);

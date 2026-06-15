@@ -1,17 +1,17 @@
-.fs-group-label {
+.cc-group-label {
   font-size: 0.8125rem;
   color: var(--color-on-surface-variant);
   margin-block-start: 1em;
 }
 
-.fs-menu-title {
+.cc-menu-title {
   display: flex;
   align-items: center;
   gap: 0.375rem;
   font-family: code, monospace;
 }
 
-.fs-settings-link {
+.cc-settings-link {
   font-size: 0.8125rem;
   line-height: 1;
   height: 1.5rem;
