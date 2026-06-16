@@ -10,6 +10,8 @@
     }
 
     for (const btn of copyBtns) {
+      btn.innerHTML = copySvg; // Set initial icon
+
       btn.addEventListener("click", async () => {
         const code = btn.parentElement?.nextElementSibling?.textContent;
 
