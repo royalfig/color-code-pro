@@ -144,6 +144,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         format: "hex",
         isUiMode: true,
         wrapper: "none",
+        style: paletteStyle,
       });
     };
     return { light: make(false), dark: make(true) };
@@ -164,6 +165,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       format: "hex",
       isUiMode: true,
       wrapper: "root",
+      style: paletteStyle,
     });
 
     const styleEl = document.createElement("style");
