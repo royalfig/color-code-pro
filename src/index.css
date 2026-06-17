@@ -23,6 +23,7 @@ body {
   background: var(--color-surface);
   color: var(--color-on-surface);
   font-family: montreal, sans-serif;
+  font-variant-ligatures: discretionary-ligatures;
 }
 
 /* Reset default <pre> margin so Shiki output sits flush in its container */
