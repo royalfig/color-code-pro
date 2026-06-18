@@ -96,6 +96,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     localStorage.setItem("paletteStyle", paletteStyle);
+    document.documentElement.setAttribute("data-style", paletteStyle);
   }, [paletteStyle]);
 
   const [baseColor, setBaseColor] = useState(() => {

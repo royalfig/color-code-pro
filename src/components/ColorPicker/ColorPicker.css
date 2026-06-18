@@ -55,6 +55,11 @@
   max-width: 500px;
   min-width: 10rem;
 
+  [data-style="diamond"] & {
+    border: 1px solid var(--color-outline);
+    box-shadow: var(--shadow-elevation-medium);
+  }
+
   &[data-starting-style],
   &[data-ending-style] {
     opacity: 0;

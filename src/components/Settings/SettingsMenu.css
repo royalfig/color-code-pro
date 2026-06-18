@@ -9,6 +9,7 @@
   align-items: center;
   gap: 0.375rem;
   font-family: code, monospace;
+  font-size: 0.875rem;
 }
 
 .cc-settings-link {

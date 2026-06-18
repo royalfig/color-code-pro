@@ -26,10 +26,15 @@ body {
   font-variant-ligatures: discretionary-ligatures;
 }
 
-/* Reset default <pre> margin so Shiki output sits flush in its container */
-.shiki {
-  margin: 0;
+:root[data-style="diamond"] {
+  --light-angle: -30deg;
+  --shadow-strength: 0.5;
 }
+
+/* Reset default <pre> margin so Shiki output sits flush in its container */
+/*.shiki {
+  margin: 0;
+}*/
 
 .container {
   height: 100dvh;
@@ -78,4 +83,9 @@ pre {
 
 .cc-center {
   justify-content: center;
+}
+
+::selection {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
 }

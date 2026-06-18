@@ -6,16 +6,8 @@ import { SettingsMenu } from "@/components/Settings/SettingsMenu";
 
 import { LINE_COL, SHAPES } from "@/lib/const";
 import { LANG_PLACEHOLDER, LANG_PRETTIER } from "@/lib/languages";
+import { canFormat, formatCode } from "@/lib/prettier";
 import { Copy, Moon, Sun, Wand, Check } from "lucide-react";
-import { format } from "prettier";
-import prettierBabel from "prettier/plugins/babel";
-import prettierEstree from "prettier/plugins/estree";
-import prettierGraphql from "prettier/plugins/graphql";
-import prettierHtml from "prettier/plugins/html";
-import prettierMarkdown from "prettier/plugins/markdown";
-import prettierPostcss from "prettier/plugins/postcss";
-import prettierTypescript from "prettier/plugins/typescript";
-import prettierYaml from "prettier/plugins/yaml";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ColorPicker from "@/components/ColorPicker/ColorPicker";
 import type { ThemeRegistration } from "shiki";
@@ -49,18 +41,17 @@ export function Container() {
   }, [lang]);
   const [renderedHtml, setRenderedHtml] = useState<string | null>(null);
   const savedCode = useRef<Record<string, string>>({ ...LANG_PLACEHOLDER });
-  const userEdited = useRef(false);
   const textRef = useRef<HTMLTextAreaElement>(null);
   const highlightSerial = useRef(0);
 
   const handleLangChange = useCallback(
     (newLang: string) => {
       if (textRef.current) {
+        // Persist the current language's edits, then load the target
+        // language's own code (its prior edit, or the stock sample).
         savedCode.current[lang] = textRef.current.value;
-        if (!userEdited.current) {
-          textRef.current.value =
-            savedCode.current[newLang] ?? LANG_PLACEHOLDER[newLang] ?? "";
-        }
+        textRef.current.value =
+          savedCode.current[newLang] ?? LANG_PLACEHOLDER[newLang] ?? "";
       }
       setLang(newLang);
     },
@@ -68,6 +59,7 @@ export function Container() {
   );
 
   const editorBg = activeTheme.colors["editor.background"];
+  const formatSupported = canFormat(LANG_PRETTIER[lang]);
 
   const doHighlight = useCallback(
     async (code: string) => {
@@ -90,31 +82,19 @@ export function Container() {
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      userEdited.current = true;
+      savedCode.current[lang] = e.target.value;
       doHighlight(e.target.value);
     },
-    [doHighlight],
+    [lang, doHighlight],
   );
 
-  const formatCode = useCallback(async () => {
-    if (!textRef.current?.value) return;
+  const handleFormat = useCallback(async () => {
     const parser = LANG_PRETTIER[lang];
-    if (!parser) return;
+    if (!canFormat(parser) || !textRef.current?.value) return;
     try {
-      const formatted = await format(textRef.current.value, {
-        parser,
-        plugins: [
-          prettierPostcss,
-          prettierBabel,
-          prettierEstree,
-          prettierTypescript,
-          prettierHtml,
-          prettierYaml,
-          prettierMarkdown,
-          prettierGraphql,
-        ],
-      });
+      const formatted = await formatCode(textRef.current.value, parser);
       textRef.current.value = formatted;
+      savedCode.current[lang] = formatted;
       await doHighlight(formatted);
     } catch (err) {
       console.error(err);
@@ -202,11 +182,19 @@ export function Container() {
           {/* Lang selector */}
           <LangSelect handleLangChange={handleLangChange} lang={lang} />
 
-          <Separator />
+          {formatSupported && (
+            <>
+              <Separator />
 
-          <IconButton variant="ghost" aria-label="Format" onClick={formatCode}>
-            <Wand size={14} />
-          </IconButton>
+              <IconButton
+                variant="ghost"
+                aria-label="Format"
+                onClick={handleFormat}
+              >
+                <Wand size={14} />
+              </IconButton>
+            </>
+          )}
         </div>
 
         <div className="cc-footer-right">
