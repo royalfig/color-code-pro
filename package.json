@@ -12,7 +12,7 @@
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@phosphor-icons/react": "^2.1.10",
-    "@royalfig/color-palette-pro": "^2.6.1",
+    "@royalfig/color-palette-pro": "^2.6.2",
     "@shikijs/langs": "^4.2.0",
     "lucide-react": "^1.18.0",
     "prettier": "^3.8.4",
