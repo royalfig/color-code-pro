@@ -2,7 +2,12 @@ import { PALETTE_LABELS } from "@/lib/const";
 import { LANG_SHORT } from "@/lib/languages";
 import type { PaletteKind } from "@/types";
 import { Select } from "@base-ui/react/select";
-import { ChevronDown, ChevronUp, ChevronsUpDown, Check } from "lucide-react";
+import {
+  CaretDownIcon,
+  CaretUpIcon,
+  CaretUpDownIcon,
+  CheckIcon,
+} from "@phosphor-icons/react";
 import "./Select.css";
 
 export function LangSelect({
@@ -33,14 +38,14 @@ export function LangSelect({
             placeholder="Select language"
           />
           <Select.Icon>
-            <ChevronsUpDown size={12} />
+            <CaretUpDownIcon size={12} />
           </Select.Icon>
         </Select.Trigger>
         <Select.Portal>
           <Select.Positioner className="" sideOffset={4}>
             <Select.Popup className="cc-popup cc-select-popup">
               <Select.ScrollUpArrow className="cc-scroll-arrow">
-                <ChevronUp size={12} />
+                <CaretUpIcon size={12} />
               </Select.ScrollUpArrow>
               <Select.List className="cc-select-list">
                 {Object.entries(LANG_SHORT).map(([value, label]) => (
@@ -50,7 +55,7 @@ export function LangSelect({
                     className="cc-select-item"
                   >
                     <Select.ItemIndicator className="cc-list-indicator">
-                      <Check size={"1em"} />
+                      <CheckIcon size={"1em"} />
                     </Select.ItemIndicator>
                     <Select.ItemText className="cc-list-text">
                       {label}
@@ -59,7 +64,7 @@ export function LangSelect({
                 ))}
               </Select.List>
               <Select.ScrollDownArrow className="cc-scroll-arrow">
-                <ChevronDown size={12} />
+                <CaretDownIcon size={12} />
               </Select.ScrollDownArrow>
             </Select.Popup>
           </Select.Positioner>
@@ -94,14 +99,14 @@ export function PaletteKindSelect({
             placeholder="Palette kind"
           />
           <Select.Icon>
-            <ChevronsUpDown size={12} />
+            <CaretUpDownIcon size={12} />
           </Select.Icon>
         </Select.Trigger>
         <Select.Portal>
           <Select.Positioner className="" sideOffset={4}>
             <Select.Popup className="cc-popup cc-select-popup">
               <Select.ScrollUpArrow className="cc-scroll-arrow">
-                <ChevronUp size={12} />
+                <CaretUpIcon size={12} />
               </Select.ScrollUpArrow>
               <Select.List className="cc-select-list">
                 {(
@@ -113,7 +118,7 @@ export function PaletteKindSelect({
                     className="cc-select-item"
                   >
                     <Select.ItemIndicator className="cc-list-indicator">
-                      <Check size={"1em"} />
+                      <CheckIcon size={"1em"} />
                     </Select.ItemIndicator>
                     <Select.ItemText className="cc-list-text">
                       {label}
@@ -122,7 +127,7 @@ export function PaletteKindSelect({
                 ))}
               </Select.List>
               <Select.ScrollDownArrow className="cc-scroll-arrow">
-                <ChevronDown size={12} />
+                <CaretDownIcon size={12} />
               </Select.ScrollDownArrow>
             </Select.Popup>
           </Select.Positioner>

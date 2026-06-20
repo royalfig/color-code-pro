@@ -18,6 +18,8 @@ Get HTML color-encoded code snippets for your blog post. Each snippet includes d
 1. Under the settings menu, download the base CSS and JS, and add them to your website.
 2. Copy the code snippet and add to your site. 
 
+> **Heads up — don't reformat the snippet.** The highlighted code lives inside a `<pre>`, which preserves every space. If you run the pasted snippet through an HTML formatter (your editor's "Format Document", Prettier, Beautify, etc.), it will re-indent the contents of the `<pre>` to match the surrounding document's nesting. Because `<pre>` is whitespace-sensitive, that injected indentation renders as a large left margin on every line — it visibly mirrors the HTML's indentation depth. To format the rest of the file safely, leave the block flush-left and wrap it with `<!-- prettier-ignore -->` (or your formatter's equivalent) so it's left untouched. The snippet's own markup is already correct as copied.
+
 ## Themes
 
 Found a theme you like? Download it for VS Code (and forks), Zed, Ghostty, and iTerm2. Download button in the settings menu. See

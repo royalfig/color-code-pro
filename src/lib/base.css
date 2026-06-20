@@ -1,4 +1,6 @@
-/* Show only the variant matching the visitor's color scheme. Adjust as needed for your app. */
+/* Dual snippets ship both a light and a dark block; show only the one matching
+   the visitor's color scheme. Single-theme snippets ship one block and ignore
+   these rules. (Email can't honor this — that's why single-theme mode exists.) */
 .cc-dark {
   display: none;
 }
@@ -13,56 +15,35 @@
   }
 }
 
-.cc-code {
-  pre {
-    position: relative;
-    padding: 0.75rem;
-    overflow-x: auto;
-    line-height: 1.1;
-    border: 1px solid var(--color-outline-variant);
-    border-radius: 0 0 0.5rem 0.5rem;
-  }
-
-  code {
-    font-size: max(14px, 0.625rem);
-    font-family:
-      ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
-      "DejaVu Sans Mono", monospace;
-    line-height: 1.1;
-  }
-}
-
-.cc-code-nav {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem;
-  font-family:
-    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
-    "DejaVu Sans Mono", monospace;
-  font-size: max(14px, 0.625rem);
-  color: var(--color-on-surface-variant);
-  text-transform: lowercase;
-  border: 1px solid var(--color-outline-variant);
-  border-bottom: 0;
-  border-radius: 0.5rem 0.5rem 0 0;
-}
-
+/* The frame — border, radius, padding, background, token colors — is inlined
+   directly on the <pre> so the snippet is fully self-contained (essential for
+   email, which strips <style>/class rules). The only thing left for this file
+   is the copy button that base.js overlays on the web. Colors are literal, not
+   custom properties, so the snippet looks right on any site. */
 .cc-code-copy {
-  display: flex;
-  gap: var(--sp-xs, 6px);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: inline-flex;
   align-items: center;
-  width: 1rem;
-  height: 1rem;
-  font-family:
-    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
-    "DejaVu Sans Mono", monospace;
-  color: var(--color-on-surface-variant);
-  text-transform: uppercase;
-  transition: color 300ms cubic-bezier(0.33, 1, 0.68, 1);
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b6b72;
+  cursor: pointer;
+  opacity: 0.55;
+  transition:
+    opacity 200ms ease,
+    color 200ms ease;
+}
 
-  &:hover {
-    color: var(--color-on-surface);
-  }
+.cc-code:hover .cc-code-copy,
+.cc-code-copy:hover,
+.cc-code-copy:focus-visible {
+  opacity: 1;
+  color: #1b1b1f;
 }

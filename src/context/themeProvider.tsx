@@ -1,10 +1,11 @@
 import { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import { ThemeContext } from "./themeContext";
-import type { Theme, PaletteKind, PaletteStyle } from "@/types";
+import type { Theme, PaletteKind, PaletteStyle, Mode } from "@/types";
 import {
   createPalettes,
   generateCodeThemePair,
   generateCssVariables,
+  type ThemeFormat,
 } from "@royalfig/color-palette-pro";
 
 /**
@@ -58,7 +59,18 @@ function randomPleasingColor(): string {
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    return (localStorage.getItem("theme") as Theme) || "system";
+    const stored = localStorage.getItem("theme");
+    // migrate the legacy "system" value to the new "dual" mode
+    if (stored === "system") return "dual";
+    return (stored as Theme) || "dual";
+  });
+
+  const [formats, setFormats] = useState<ThemeFormat[]>(["vscode"]);
+
+  const [mode, setMode] = useState<Mode>(() => {
+    const stored = localStorage.getItem("mode");
+
+    return (stored as Mode) || "theme";
   });
 
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
@@ -69,7 +81,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
     const updateTheme = () => {
       const active =
-        theme === "system" ? (mediaQuery.matches ? "dark" : "light") : theme;
+        theme === "dual" ? (mediaQuery.matches ? "dark" : "light") : theme;
       setResolvedTheme(active);
       root.classList.remove("light", "dark");
       root.classList.add(active);
@@ -229,6 +241,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         themePair,
         uiVarsPair,
         palette,
+        mode,
+        setMode,
+        formats,
+        setFormats,
       }}
     >
       {children}

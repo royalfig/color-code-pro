@@ -1,6 +1,11 @@
 import { createContext } from "react";
-import type { Theme, PaletteKind, PaletteStyle } from "@/types";
-import type { BaseColorData, CodeThemeOutput } from "@royalfig/color-palette-pro";
+import type { Theme, PaletteKind, PaletteStyle, Mode } from "@/types";
+import { type ThemeFormat } from "@royalfig/color-palette-pro";
+
+import type {
+  BaseColorData,
+  CodeThemeOutput,
+} from "@royalfig/color-palette-pro";
 
 interface ThemeContextType {
   theme: Theme;
@@ -16,6 +21,10 @@ interface ThemeContextType {
   themePair: { light: CodeThemeOutput; dark: CodeThemeOutput };
   uiVarsPair: { light: string; dark: string };
   palette: BaseColorData[];
+  mode: Mode;
+  setMode: (mode: Mode) => void;
+  formats: ThemeFormat[];
+  setFormats: (format: ThemeFormat[]) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(

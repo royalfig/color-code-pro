@@ -1,13 +1,19 @@
 import { Button, IconButton } from "@/components/Button/Button";
 import { useTheme } from "@/hooks/useTheme";
+import { useThemeDownload } from "@/hooks/useThemeDownload";
 import baseCss from "@/lib/base.css?raw";
 import baseJs from "@/lib/base.js?raw";
-import { FORMATS } from "@/lib/const";
 import { Menu } from "@base-ui/react/menu";
-import { generateTheme, type ThemeFormat } from "@royalfig/color-palette-pro";
-import { Download, Settings, Circle, ExternalLink } from "lucide-react";
+import { Switch } from "@base-ui/react/switch";
+import {
+  ArrowSquareOutIcon,
+  CircleIcon,
+  DownloadSimpleIcon,
+  GearIcon,
+} from "@phosphor-icons/react";
 import { useCallback, useId } from "react";
 import "./SettingsMenu.css";
+import "./SnippetSwitch.css";
 
 function GitHubLogo() {
   return (
@@ -74,25 +80,12 @@ export function SettingsMenu() {
     paletteKind,
     paletteStyle,
     uiVarsPair,
-    resolvedTheme,
     palette,
     baseColor,
+    mode,
+    setMode,
   } = useTheme();
-
-  const downloadFile = useCallback(
-    (content: string, filename: string, mimeType: string) => {
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    },
-    [],
-  );
+  const { downloadFile } = useThemeDownload();
 
   const downloadCss = useCallback(() => {
     const scope = (selector: string, vars: string) =>
@@ -105,33 +98,12 @@ export function SettingsMenu() {
     downloadFile(css, "color-code-base.css", "text/css");
   }, [uiVarsPair, downloadFile]);
 
-  const downloadTheme = useCallback(
-    (outputFormat: ThemeFormat) => {
-      const base = palette.find((c) => c.isBase)!;
-      const serialized = generateTheme(
-        base.color,
-        palette,
-        resolvedTheme === "dark",
-        paletteKind,
-        paletteStyle,
-        outputFormat,
-      );
-      const meta = FORMATS.find((f) => f.value === outputFormat)!;
-      downloadFile(
-        serialized,
-        `color-code-${resolvedTheme}.${meta.ext}`,
-        meta.mime,
-      );
-    },
-    [palette, resolvedTheme, paletteKind, paletteStyle, downloadFile],
-  );
-
   return (
     <Menu.Root>
       <Menu.Trigger
         render={
           <IconButton variant="ghost" aria-label="Settings">
-            <Settings size={14} />
+            <GearIcon size={14} />
           </IconButton>
         }
       ></Menu.Trigger>
@@ -150,10 +122,23 @@ export function SettingsMenu() {
 
             <p className="cc-group-label">Snippet Base</p>
 
+            <label className="cc-switch-label">
+              <Switch.Root
+                checked={mode === "snippet"}
+                className="cc-switch"
+                onCheckedChange={(checked) => {
+                  setMode(checked ? "snippet" : "theme");
+                }}
+              >
+                <Switch.Thumb className="cc-switch-thumb" />
+              </Switch.Root>
+              Snippet Mode
+            </label>
+
             <Button
               variant="ghost"
               onClick={downloadCss}
-              icon={<Download size={14} />}
+              icon={<DownloadSimpleIcon size={14} />}
             >
               CSS
             </Button>
@@ -167,44 +152,10 @@ export function SettingsMenu() {
                   "application/javascript",
                 )
               }
-              icon={<Download size={14} />}
+              icon={<DownloadSimpleIcon size={14} />}
             >
               JS
             </Button>
-            <p className="cc-group-label">Theme</p>
-
-            <Button
-              variant="ghost"
-              onClick={() => downloadTheme("vscode")}
-              icon={<Download size={14} />}
-            >
-              VS Code
-            </Button>
-
-            <Button
-              variant="ghost"
-              onClick={() => downloadTheme("zed")}
-              icon={<Download size={14} />}
-            >
-              Zed
-            </Button>
-
-            <Button
-              variant="ghost"
-              onClick={() => downloadTheme("ghostty")}
-              icon={<Download size={14} />}
-            >
-              Ghostty
-            </Button>
-
-            <Button
-              variant="ghost"
-              onClick={() => downloadTheme("iterm2")}
-              icon={<Download size={14} />}
-            >
-              iTerm2
-            </Button>
-
             <p className="cc-group-label">Resources</p>
 
             <a
@@ -213,14 +164,10 @@ export function SettingsMenu() {
               href={`https://colorpalette.pro?color=${encodeURIComponent(baseColor)}&colorFormat=hex&paletteType=${paletteKind}&paletteStyle=${paletteStyle}`}
             >
               <span>
-                <Circle
-                  fill={baseColor}
-                  stroke={"var(--color-outline"}
-                  size={"1em"}
-                />{" "}
+                <CircleIcon color={baseColor} weight="fill" size={"1em"} />{" "}
                 ColorPalette Pro
               </span>
-              <ExternalLink size={"1em"} />
+              <ArrowSquareOutIcon size={"1em"} />
             </a>
             <a
               className="cc-settings-link"
@@ -231,7 +178,7 @@ export function SettingsMenu() {
                 <GitHubLogo />
                 GitHub
               </span>
-              <ExternalLink size={"1em"} />
+              <ArrowSquareOutIcon size={"1em"} />
             </a>
           </Menu.Popup>
         </Menu.Positioner>

@@ -1,6 +1,15 @@
-import type { PaletteKind, PaletteStyle } from "@/types/index";
+import type { PaletteKind, PaletteStyle, Theme } from "@/types/index";
 import { type ThemeFormat } from "@royalfig/color-palette-pro";
-import { Circle, Diamond, Square, Triangle } from "lucide-react";
+import {
+  CircleIcon,
+  DiamondIcon,
+  SquareIcon,
+  TriangleIcon,
+  SunIcon,
+  MoonIcon,
+  CircleHalfIcon,
+  IconWeight,
+} from "@phosphor-icons/react";
 
 export const PALETTE_LABELS: Record<PaletteKind, string> = {
   ana: "Analogous",
@@ -25,17 +34,27 @@ export const FORMATS: {
     ext: "itermcolors",
     mime: "application/xml",
   },
-  { value: "ghostty", label: "Ghostty", ext: "conf", mime: "text/plain" },
+  { value: "ghostty", label: "Ghostty", ext: "", mime: "text/plain" },
 ];
 
 export const SHAPES: {
   value: PaletteStyle;
   Icon: React.FC<{ size?: number }>;
 }[] = [
-  { value: "square", Icon: Square },
-  { value: "triangle", Icon: Triangle },
-  { value: "circle", Icon: Circle },
-  { value: "diamond", Icon: Diamond },
+  { value: "square", Icon: SquareIcon },
+  { value: "triangle", Icon: TriangleIcon },
+  { value: "circle", Icon: CircleIcon },
+  { value: "diamond", Icon: DiamondIcon },
+];
+
+export const THEME_MODES: {
+  value: Theme;
+  label: string;
+  Icon: React.FC<{ size?: number; weight?: IconWeight }>;
+}[] = [
+  { value: "dual", label: "Dual — light + dark", Icon: CircleHalfIcon },
+  { value: "light", label: "Light", Icon: MoonIcon },
+  { value: "dark", label: "Dark", Icon: SunIcon },
 ];
 
 // Must match the CSS custom property --cc-line-col in index.css
