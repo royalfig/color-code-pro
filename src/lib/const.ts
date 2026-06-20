@@ -1,15 +1,15 @@
 import type { PaletteKind, PaletteStyle, Theme } from "@/types/index";
-import { type ThemeFormat } from "@royalfig/color-palette-pro";
 import {
+  CircleHalfIcon,
   CircleIcon,
   DiamondIcon,
-  SquareIcon,
-  TriangleIcon,
-  SunIcon,
-  MoonIcon,
-  CircleHalfIcon,
   IconWeight,
+  MoonIcon,
+  SquareIcon,
+  SunIcon,
+  TriangleIcon,
 } from "@phosphor-icons/react";
+import { type ThemeFormat } from "@royalfig/color-palette-pro";
 
 export const PALETTE_LABELS: Record<PaletteKind, string> = {
   ana: "Analogous",
@@ -34,7 +34,19 @@ export const FORMATS: {
     ext: "itermcolors",
     mime: "application/xml",
   },
-  { value: "ghostty", label: "Ghostty", ext: "", mime: "text/plain" },
+  { value: "ghostty", label: "Ghostty", ext: "conf", mime: "text/plain" },
+  {
+    value: "alacritty",
+    ext: "toml",
+    mime: "text/plain",
+    label: "Alacritty",
+  },
+  {
+    value: "warp",
+    label: "Warp",
+    ext: "yaml",
+    mime: "text/plain",
+  },
 ];
 
 export const SHAPES: {
