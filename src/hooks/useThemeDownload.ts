@@ -41,7 +41,7 @@ export function useThemeDownload() {
       // (e.g. VS Code and Zed both emit .json).
       downloadFile(
         serialized,
-        `color-code-${outputFormat}-${resolvedTheme}.${meta.ext}`,
+        `color-code-${outputFormat}-${resolvedTheme}${meta.ext && "."}${meta.ext && meta.ext}`,
         meta.mime,
       );
     },
