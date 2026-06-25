@@ -29,6 +29,11 @@
   &:hover {
     background-color: var(--color-primary-container);
     color: var(--color-on-primary-container);
+
+    :where([data-style="diamond"], [data-style="circle"]) & {
+      background-color: var(--color-primary);
+      color: var(--color-on-primary);
+    }
   }
 
   span {

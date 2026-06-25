@@ -14,7 +14,6 @@
     "@phosphor-icons/react": "^2.1.10",
     "@royalfig/color-palette-pro": "latest",
     "@shikijs/langs": "^4.2.0",
-    "lucide-react": "^1.18.0",
     "prettier": "^3.8.4",
     "react": "^19.2.7",
     "react-colorful": "^5.7.0",

@@ -39,6 +39,11 @@
   [data-style="diamond"] & {
     border-color: var(--color-outline);
   }
+
+  :where([data-style="diamond"], [data-style="circle"]) & {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
 }
 
 /* Ghost button (icon-only, no border) */
@@ -61,8 +66,12 @@
   background: var(--color-container-overlay);
 
   [data-style="diamond"] & {
-    background: transparent;
     border: 1px solid var(--color-outline);
+  }
+
+  :where([data-style="diamond"], [data-style="circle"]) & {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
   }
 }
 
@@ -74,6 +83,11 @@
 .cc-btn-active {
   background: var(--color-primary-container);
   color: var(--color-on-primary-container);
+
+  :where([data-style="diamond"], [data-style="circle"]) & {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
 }
 
 /* Labeled button (footer: Format, Copy, Download JSON) */
@@ -99,6 +113,13 @@
 
   &:hover {
     background: var(--color-container-overlay);
+  }
+
+  :where([data-style="diamond"], [data-style="circle"]) & {
+    &:hover {
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+    }
   }
 
   &:active {
@@ -146,4 +167,9 @@
   background: var(--color-primary-container);
   color: var(--color-on-primary-container);
   border-color: transparent;
+
+  :where([data-style="diamond"], [data-style="circle"]) & {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
 }
