@@ -15,8 +15,8 @@ importers:
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@royalfig/color-palette-pro':
-        specifier: latest
-        version: 3.0.0
+        specifier: ^3.2.0
+        version: 3.2.0
       '@shikijs/langs':
         specifier: ^4.2.0
         version: 4.2.0
@@ -409,8 +409,8 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@royalfig/color-palette-pro@3.0.0':
-    resolution: {integrity: sha512-bdQD/ZPX7cVW6IPUci23uuOSZULmVAN7YaXGFh+xQdo1UkVA3b1nlPcdOOkgtEgwgOdgLifBT61qMpj+DArzuQ==}
+  '@royalfig/color-palette-pro@3.2.0':
+    resolution: {integrity: sha512-yHeYvIpK3xwg3eQBbLRvmNDIyNHt9dFLk6mPN0mBtzNot9fvzZvd3qJb5/nUmpZ60ztfSUJkZUIxAebqPRSSyQ==}
 
   '@shikijs/core@4.2.0':
     resolution: {integrity: sha512-Hc87Ab1Ld/vEbZRCbwx344I5v+4RU8CVToUTRkqXL1+TjbuOp9U5Xa0M23V4GEWHxVn+yO5otb+HkQVm3ptWQQ==}
@@ -1506,7 +1506,7 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@royalfig/color-palette-pro@3.0.0':
+  '@royalfig/color-palette-pro@3.2.0':
     dependencies:
       colorjs.io: 0.6.1
 
