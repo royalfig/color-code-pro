@@ -22,8 +22,9 @@
    custom properties, so the snippet looks right on any site. */
 .cc-code-copy {
   position: absolute;
-  top: 0.5rem;
+  top: 50%;
   right: 0.5rem;
+  translate: 0 -50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -33,7 +34,7 @@
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: #6b6b72;
+  color: inherit;
   cursor: pointer;
   opacity: 0.55;
   transition:
@@ -41,9 +42,7 @@
     color 200ms ease;
 }
 
-.cc-code:hover .cc-code-copy,
 .cc-code-copy:hover,
 .cc-code-copy:focus-visible {
   opacity: 1;
-  color: #1b1b1f;
 }

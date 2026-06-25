@@ -91,8 +91,8 @@ export function SettingsMenu() {
     const scope = (selector: string, vars: string) =>
       `${selector} {\n${vars.replace(/^/gm, "  ")}\n}`;
     const css = [
-      scope(".cc-light", uiVarsPair.light),
-      scope(".cc-dark", uiVarsPair.dark),
+      scope(".cc-light", uiVarsPair.light.css),
+      scope(".cc-dark", uiVarsPair.dark.css),
       baseCss,
     ].join("\n\n");
     downloadFile(css, "color-code-base.css", "text/css");

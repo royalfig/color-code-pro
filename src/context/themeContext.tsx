@@ -19,7 +19,10 @@ interface ThemeContextType {
   setBaseColor: (color: string) => void;
   activeTheme: CodeThemeOutput;
   themePair: { light: CodeThemeOutput; dark: CodeThemeOutput };
-  uiVarsPair: { light: string; dark: string };
+  uiVarsPair: {
+    light: { css: string; palette: BaseColorData[] };
+    dark: { css: string; palette: BaseColorData[] };
+  };
   palette: BaseColorData[];
   mode: Mode;
   setMode: (mode: Mode) => void;

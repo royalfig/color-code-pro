@@ -11,7 +11,7 @@
     for (const block of blocks) {
       if (block.dataset.ccEnhanced) continue;
       const pre = block.querySelector("pre");
-      const cell = pre && pre.parentElement;
+      const cell = pre && pre.parentElement.firstChild;
       if (!pre || !cell) continue;
       block.dataset.ccEnhanced = "1";
 

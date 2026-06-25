@@ -7,6 +7,7 @@ import {
   generateCssVariables,
   type ThemeFormat,
 } from "@royalfig/color-palette-pro";
+import { FORMATS } from "@/lib/const";
 
 /**
  * Generate a random hex color in a pleasing HSL range for theme generation.
@@ -65,15 +66,49 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     return (stored as Theme) || "dual";
   });
 
-  const [formats, setFormats] = useState<ThemeFormat[]>(["vscode"]);
+  const [formats, setFormats] = useState<ThemeFormat[]>(() => {
+    const stored = localStorage.getItem("formats");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          // Drop any persisted formats we no longer ship.
+          const valid = parsed.filter((f): f is ThemeFormat =>
+            FORMATS.some((meta) => meta.value === f),
+          );
+          if (valid.length) return valid;
+        }
+      } catch {
+        // ignore malformed persisted value
+      }
+    }
+    return ["vscode"];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("formats", JSON.stringify(formats));
+  }, [formats]);
 
   const [mode, setMode] = useState<Mode>(() => {
     const stored = localStorage.getItem("mode");
-
     return (stored as Mode) || "theme";
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+  useEffect(() => {
+    localStorage.setItem("mode", mode);
+  }, [mode]);
+
+  // Resolve the scheme up front (from stored theme + prefers-color-scheme) so
+  // the first #color-vars injection already uses the right scheme — otherwise a
+  // dark-mode user flashes light-surface before the post-paint effect corrects
+  // it. Mirrors the blocking <head> script in index.html.
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() =>
+    theme === "dual"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme,
+  );
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -153,15 +188,30 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         true,
         isDarkMode,
       );
-      return generateCssVariables(uiPalette, {
-        format: "hex",
-        isUiMode: true,
-        wrapper: "none",
-        style: paletteStyle,
-      });
+      return {
+        css: generateCssVariables(uiPalette, {
+          format: "hex",
+          isUiMode: true,
+          wrapper: "none",
+          style: paletteStyle,
+        }),
+        palette: uiPalette,
+      };
     };
     return { light: make(false), dark: make(true) };
   }, [baseColor, paletteKind, paletteStyle]);
+
+  // Persist each scheme's surface color so the blocking <head> script in
+  // index.html can paint the correct background before first paint — the
+  // generated --color-* vars don't exist yet on a cold load.
+  useEffect(() => {
+    const light = uiVarsPair.light.palette.find((c) => c.code === "surface")
+      ?.string;
+    const dark = uiVarsPair.dark.palette.find((c) => c.code === "surface")
+      ?.string;
+    if (light) localStorage.setItem("bg-light", light);
+    if (dark) localStorage.setItem("bg-dark", dark);
+  }, [uiVarsPair]);
 
   useLayoutEffect(() => {
     const uiPalette = createPalettes(

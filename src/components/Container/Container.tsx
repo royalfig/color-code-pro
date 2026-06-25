@@ -16,6 +16,7 @@ import { useTheme } from "../../hooks/useTheme";
 import { highlightCode } from "../../lib/shiki";
 import { Button, ButtonGroup, IconButton } from "../Button/Button";
 import "./Container.css";
+import { BaseColorData } from "@royalfig/color-palette-pro";
 
 export function Container() {
   const {
@@ -27,6 +28,7 @@ export function Container() {
     setPaletteStyle,
     activeTheme,
     themePair,
+    uiVarsPair,
     mode,
   } = useTheme();
 
@@ -116,9 +118,12 @@ export function Container() {
   const copy = useCallback(async () => {
     const code = textRef.current?.value;
     if (!code) return;
+
     let snippet: string;
     if (theme === "dual") {
-      // Both variants + a prefers-color-scheme toggle (needs base.css; web-only).
+      // Ship both variants with baked token colors. The frame is driven by the
+      // --color-* vars in the downloaded base.css, which also hides the
+      // non-matching block via prefers-color-scheme. Web-only (needs base.css).
       const [lightHtml, darkHtml] = await Promise.all([
         highlightCode(code, lang, themePair.light as ThemeRegistration),
         highlightCode(code, lang, themePair.dark as ThemeRegistration),
@@ -126,23 +131,24 @@ export function Container() {
       if (!lightHtml || !darkHtml) return;
       snippet = dualWrapper(lang, lightHtml, darkHtml);
     } else {
-      // A single self-contained variant that works on the web AND in email.
+      // One self-contained variant with literal colors — works on the web AND
+      // in email (no external CSS, no prefers-color-scheme).
+      const scheme = theme === "dark" ? "dark" : "light";
       const html = await highlightCode(
         code,
         lang,
-        (theme === "dark"
-          ? themePair.dark
-          : themePair.light) as ThemeRegistration,
+        themePair[scheme] as ThemeRegistration,
       );
       if (!html) return;
-      snippet = codeBlock(lang, html);
+      snippet = codeBlock(lang, html, frameColors(uiVarsPair[scheme].palette));
     }
+
     await navigator.clipboard.writeText(snippet);
     setCopyButtonIconToUse(<CheckIcon size={14} />);
     setTimeout(() => {
       setCopyButtonIconToUse(<CopyIcon size={14} />);
     }, 2000);
-  }, [lang, themePair, theme]);
+  }, [lang, themePair, theme, uiVarsPair]);
 
   return (
     <div className="cc-card">
@@ -245,38 +251,79 @@ export function Container() {
   );
 }
 
-// The frame lives inline on the <pre> so the snippet is self-contained in email
-// (mail clients keep inline styles but strip <style>/class rules). Shiki already
-// inlines token colors + background; we add the container styles here.
-const PRE_INLINE =
-  "margin:0;padding:16px;border:1px solid #e3e3e8;border-radius:8px;" +
-  "overflow-x:auto;white-space:pre;" +
-  "font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;" +
-  "font-size:13px;line-height:1.5;";
+// The frame around Shiki's output: border, background, and the language label.
+// Single-theme snippets pass literal hex so the block is fully self-contained
+// (email keeps inline styles but strips <style>/class rules). Dual snippets pass
+// var(--…) refs that resolve from the downloaded base.css instead.
+type FrameColors = { fg: string; outline: string; bg: string };
 
-// Prepend container styles into the <pre>'s existing inline style attribute.
-const inlinePreStyles = (shikiHtml: string) =>
-  shikiHtml.replace(/(<pre\b[^>]*\bstyle=")/, `$1${PRE_INLINE}`);
+// Literal frame colors for one scheme, pulled from its UI palette. Used by the
+// self-contained single-theme snippets.
+const frameColors = (palette: BaseColorData[]): FrameColors => {
+  const pick = (code: string) => palette.find((x) => x.code === code)?.string;
+  const fg = pick("on-surface-variant");
+  const outline = pick("outline-variant");
+  // `container` (not `surface`) so the header bar matches the app's card/header,
+  // whose value shifts across palette styles.
+  const bg = pick("container");
+  if (!fg || !outline || !bg) {
+    throw new Error("Missing UI frame color (container/outline/on-surface)");
+  }
+  return { fg, outline, bg };
+};
 
-// One self-contained block: an Outlook-safe single-cell table, an inline lang
-// label, and the inline-styled <pre>. No copy button in the markup — base.js
-// overlays one on the web (it never runs in email, which is the point). The
-// .cc-code class + position:relative cell give that overlay an anchor.
-const codeBlock = (lang: string, shikiHtml: string) => {
-  const label =
-    `<div style="font-family:ui-monospace,monospace;font-size:12px;font-weight:600;` +
-    `letter-spacing:.05em;text-transform:uppercase;color:#6b6b72;padding:0 0 6px;">${lang}</div>`;
+// Frame driven by the --color-* custom properties base.css emits per scheme.
+// Used by dual snippets, where each block's literal scheme would be redundant
+// (base.css already hides the non-matching one) — the vars keep both blocks in
+// sync with whatever the included base.css defines.
+const VAR_FRAME: FrameColors = {
+  fg: "var(--color-on-surface-variant)",
+  outline: "var(--color-outline-variant)",
+  bg: "var(--color-container)",
+};
+
+// One block: a bordered, rounded container holding a header bar (frame bg + the
+// language label, divided from the body by a bottom border) and Shiki's <pre>
+// (its own baked code-area background). Plain block-level divs — they stack and
+// render in email too; only border-radius/overflow degrade in Outlook, which a
+// table wouldn't save anyway. No copy button in the markup: base.js overlays one
+// on the web (it never runs in email, which is the point), anchored to the
+// .cc-code container via position:relative.
+const codeBlock = (
+  lang: string,
+  shikiHtml: string,
+  { fg, outline, bg }: FrameColors,
+) => {
+  const CONTAINER =
+    `margin:16px 0;border:1px solid ${outline};` +
+    `border-radius:8px;overflow:hidden;background:${bg};`;
+
+  const HEADER =
+    `position:relative;padding:8px 12px;background:${bg};border-bottom:1px solid ${outline};` +
+    `color:${fg};font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;` +
+    `font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;`;
+
+  const PRE_INLINE =
+    `margin:0;padding:16px;overflow-x:auto;white-space:pre;` +
+    `font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;` +
+    `font-size:13px;line-height:1.5;`;
+
+  // Prepend our styles onto the <pre>'s existing inline style, keeping Shiki's
+  // baked background-color + token color.
+  const inlinePreStyles = (html: string) =>
+    html.replace(/(<pre\b[^>]*\bstyle=")/, `$1${PRE_INLINE}`);
+
   return (
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" ` +
-    `class="cc-code" data-lang="${lang}" style="border-collapse:collapse;margin:16px 0;"><tr>` +
-    `<td style="padding:0;position:relative;">${label}${inlinePreStyles(shikiHtml)}</td>` +
-    `</tr></table>`
+    `<div class="cc-code" data-lang="${lang}" style="${CONTAINER}">` +
+    `<div style="${HEADER}">${lang}</div>` +
+    inlinePreStyles(shikiHtml) +
+    `</div>`
   );
 };
 
 // Dual mode ships both variants wrapped in .cc-light/.cc-dark; base.css toggles
-// them via prefers-color-scheme. Web-only — email has no way to hide one, so it
-// shows both (which is why light/dark mode exists for newsletters).
+// them via prefers-color-scheme. Web-only — email has no way to hide one, so
+// light/dark mode exists for newsletters.
 const dualWrapper = (lang: string, lightHtml: string, darkHtml: string) =>
-  `<div class="cc-light">${codeBlock(lang, lightHtml)}</div>` +
-  `<div class="cc-dark">${codeBlock(lang, darkHtml)}</div>`;
+  `<div class="cc-light">${codeBlock(lang, lightHtml, VAR_FRAME)}</div>` +
+  `<div class="cc-dark">${codeBlock(lang, darkHtml, VAR_FRAME)}</div>`;
