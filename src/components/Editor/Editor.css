@@ -8,10 +8,10 @@
   overflow: auto;
   aspect-ratio: 2.5;
   height: auto;
-
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
+  scrollbar-color: var(--color-outline) var(--color-container);
 }
 
 .cc-editor-preview,
