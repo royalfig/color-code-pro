@@ -120,6 +120,11 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       setResolvedTheme(active);
       root.classList.remove("light", "dark");
       root.classList.add(active);
+      // The blocking <head> script writes color-scheme inline for the first
+      // paint; inline styles outrank the .light/.dark class rules, so we must
+      // keep it in sync here or native form controls stay frozen at the
+      // load-time scheme when the theme (or OS preference, in dual mode) changes.
+      root.style.colorScheme = active;
 
       localStorage.setItem("theme", theme);
     };
